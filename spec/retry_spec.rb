@@ -214,7 +214,8 @@ RSpec.describe ActiveJob::Retry do
       end
 
       it 'logs the retry' do
-        expect(ActiveJob::Base.logger).to receive(:log).with(/attempt 2/)
+        expect(ActiveJob::Base.logger).to receive(:log).
+          with(Logger::INFO, 'Retrying (attempt 1)')
         retry_or_reraise
       end
 

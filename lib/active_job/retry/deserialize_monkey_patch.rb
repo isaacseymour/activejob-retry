@@ -17,6 +17,6 @@ class ActiveJob::Base
   def deserialize(job_data)
     self.job_id               = job_data['job_id']
     self.queue_name           = job_data['queue_name']
-    self.serialized_arguments = job_data['serialized_arguments']
+    self.serialized_arguments = job_data['arguments']
   end
 end

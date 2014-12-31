@@ -81,7 +81,7 @@ module ActiveJob
 
     # Override `rescue_with_handler` to make sure our catch is the last one, and doesn't
     # happen if the exception has already been caught in a `rescue_from`
-    def rescue_with_handler
+    def rescue_with_handler(exception)
       super || retry_or_reraise(exception)
     end
 
@@ -89,7 +89,7 @@ module ActiveJob
     # Retrying logic #
     ##################
     def retry_attempt
-      @retry_attempt ||= 1
+      @retry_attempt ||= 0
     end
 
     # Override me if you want more complex behaviour
@@ -112,7 +112,7 @@ module ActiveJob
     def retry_or_reraise(exception)
       raise exception unless should_retry?(exception)
 
-      logger.log("Retrying #{self.class} (attempt #{retry_attempt + 1})")
+      logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1})")
       retry_job(wait: retry_delay)
     end
   end
