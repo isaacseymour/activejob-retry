@@ -14,7 +14,24 @@ class ProcessWebhook < ActiveJob::Base
              # Could alternatively use:
              # fatal_exceptions: [StandardError] # Never catch these errors (default: none)
 
-  def process(webhook)
+  def perform(webhook)
+    webhook.process!
+  end
+end
+```
+
+With exponential backoff:
+
+```ruby
+class ProcessWebhook < ActiveJob::Base
+  include ActiveJob::Retry::ExponentialBackoff
+
+  queue_as :webhooks
+  backoff_with strategy: [1, 5, 10, 30, 60] # Delay for 1, 5, ... seconds between subsequent retries
+               min_delay_multiplier: 0.8,   # Multiply each delay by a random number between
+               max_delay_multiplier: 1.2    # 0.8 and 1.2 (rounded to nearest second)
+
+  def perform(webhook)
     webhook.process!
   end
 end
