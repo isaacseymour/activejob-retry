@@ -112,8 +112,9 @@ module ActiveJob
     def retry_or_reraise(exception)
       raise exception unless should_retry?(exception)
 
-      logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1})")
-      retry_job(wait: retry_delay)
+      this_delay = retry_delay
+      logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
+      retry_job(wait: this_delay)
     end
   end
 end

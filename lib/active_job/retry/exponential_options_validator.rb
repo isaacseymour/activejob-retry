@@ -3,9 +3,9 @@ module ActiveJob
     class ExponentialOptionsValidator
       DELAY_MULTIPLIER_KEYS = %i(min_delay_multiplier max_delay_multiplier).freeze
 
-      def initialize(options, retry_limit)
+      def initialize(options)
         @options = options
-        @retry_limit = retry_limit
+        @retry_limit = options[:limit] || options.fetch(:strategy, []).length
       end
 
       def validate!
@@ -49,7 +49,7 @@ module ActiveJob
       end
 
       def both_or_neither_multiplier_supplied?
-        supplied = DELAY_MULTIPLIER_KEYS.map { |key| options.has?(key) }
+        supplied = DELAY_MULTIPLIER_KEYS.map { |key| options.key?(key) }
         supplied.none? || supplied.all?
       end
     end

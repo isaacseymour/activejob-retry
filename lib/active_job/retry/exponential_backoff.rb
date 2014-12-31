@@ -36,13 +36,14 @@ module ActiveJob
       end
 
       module ClassMethods
-        extend ActiveJob::Retry::ClassMethods
+        include ActiveJob::Retry::ClassMethods
 
         # Setup DSL
-        def retry_with(options)
-          super(options)
-          ExponentialOptionsValidator.new(options, retry_limit).validate!
+        def backoff_with(options)
+          retry_with(options)
+          ExponentialOptionsValidator.new(options).validate!
 
+          @retry_limit          = options[:limit] || options[:strategy].length if options[:strategy]
           @backoff_strategy     = options[:strategy]             if options[:strategy]
           @min_delay_multiplier = options[:min_delay_multiplier] if options[:min_delay_multiplier]
           @max_delay_multiplier = options[:max_delay_multiplier] if options[:max_delay_multiplier]
@@ -52,7 +53,7 @@ module ActiveJob
         # Defaults #
         ############
         def retry_limit
-          @retry_limit ||= backoff_strategy.length
+          @retry_limit ||= (backoff_strategy || []).length
         end
 
         def backoff_strategy
@@ -72,19 +73,19 @@ module ActiveJob
       # Retry logic #
       ###############
       def retry_delay
-        delay = backoff_strategy[retry_attempt]
+        delay = self.class.backoff_strategy[retry_attempt]
 
-        return (delay * max_delay_multiplier).to_i unless random_delay?
+        return (delay * self.class.max_delay_multiplier).to_i unless random_delay?
 
         (delay * rand(random_delay_range)).to_i
       end
 
       def random_delay?
-        retry_delay_multiplicand_min != retry_delay_multiplicand_max
+        self.class.min_delay_multiplier != self.class.max_delay_multiplier
       end
 
       def random_delay_range
-        min_delay_multiplier..max_delay_multiplier
+        self.class.min_delay_multiplier..self.class.max_delay_multiplier
       end
     end
   end
