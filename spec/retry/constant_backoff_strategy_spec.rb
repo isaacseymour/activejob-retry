@@ -9,7 +9,7 @@ RSpec.describe ActiveJob::Retry::ConstantBackoffStrategy do
     let(:exception) { RuntimeError.new }
 
     context 'when the limit is infinite' do
-      let(:options) { { limit: -1, infinite_job: true } }
+      let(:options) { { limit: nil, unlimited_retries: true } }
 
       context '1st attempt' do
         let(:attempt) { 1 }
