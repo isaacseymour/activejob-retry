@@ -29,8 +29,6 @@ module ActiveJob
     #   end
     #
     module ExponentialBackoff
-      include ActiveJob::Retry
-
       def self.included(base)
         base.extend(ClassMethods)
       end

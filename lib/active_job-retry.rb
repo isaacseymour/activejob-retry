@@ -1,5 +1,4 @@
 require 'active_job'
-require 'active_support'
 
 require 'active_job/retry'
 require 'active_job/retry/exponential_backoff'
