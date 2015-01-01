@@ -1,11 +1,9 @@
 AllCops:
   Include:
     - Rakefile
-    - lib/**/*
-    - spec/**/*
   Exclude:
     - .*/**/*
-    - .**/*
+    - vendor/**
     - test/**/*
 
 LineLength:
