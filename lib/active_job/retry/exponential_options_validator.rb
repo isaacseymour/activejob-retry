@@ -1,7 +1,10 @@
 module ActiveJob
   module Retry
     class ExponentialOptionsValidator
-      DELAY_MULTIPLIER_KEYS = %i(min_delay_multiplier max_delay_multiplier).freeze
+      DELAY_MULTIPLIER_KEYS = [
+        :min_delay_multiplier,
+        :max_delay_multiplier
+      ].freeze
 
       def initialize(options)
         @options = options
