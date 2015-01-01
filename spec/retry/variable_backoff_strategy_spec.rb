@@ -61,7 +61,7 @@ RSpec.describe ActiveJob::Retry::VariableBackoffStrategy do
     end
 
     context 'with whitelist' do
-      let(:options) { { delays: [10], retry_exceptions: [RuntimeError] } }
+      let(:options) { { delays: [10], retryable_exceptions: [RuntimeError] } }
 
       context 'Exception' do
         let(:exception) { Exception.new }

@@ -12,11 +12,14 @@ module ActiveJob
         validate_infinite_limit!
         validate_delay!
         validate_not_both_exceptions!
-        # Fatal exceptions must be an array (cannot be nil, since then all exceptions
-        # would be fatal - for that just set `limit: 0`)
+        # Fatal exceptions must be an array (cannot be nil, since then all
+        # exceptions would be fatal - for that just set `limit: 0`)
         validate_array_of_exceptions!(:fatal_exceptions)
-        # Retry exceptions must be an array of exceptions or `nil` to retry any exception
-        validate_array_of_exceptions!(:retry_exceptions) if options[:retry_exceptions]
+        # Retryable exceptions must be an array of exceptions or `nil` to retry
+        # any exception
+        if options[:retryable_exceptions]
+          validate_array_of_exceptions!(:retryable_exceptions)
+        end
       end
 
       private
@@ -56,10 +59,10 @@ module ActiveJob
       end
 
       def validate_not_both_exceptions!
-        return unless options[:fatal_exceptions] && options[:retry_exceptions]
+        return unless options[:fatal_exceptions] && options[:retryable_exceptions]
 
         raise InvalidConfigurationError,
-              'fatal_exceptions and retry_exceptions cannot be used together'
+              'fatal_exceptions and retryable_exceptions cannot be used together'
       end
 
       def validate_array_of_exceptions!(key)

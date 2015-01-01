@@ -27,13 +27,15 @@ RSpec.describe ActiveJob::Retry::VariableOptionsValidator do
       it { is_expected.to_not raise_error }
     end
 
-    context 'retry exceptions' do
-      let(:options) { { delays: [], retry_exceptions: [StandardError, NoMethodError] } }
+    context 'retryable_exceptions' do
+      let(:options) do
+        { delays: [], retryable_exceptions: [StandardError, NoMethodError] }
+      end
       it { is_expected.to_not raise_error }
     end
 
     context 'multiple options' do
-      let(:options) { { delays: [0, 10, 60], retry_exceptions: [RuntimeError] } }
+      let(:options) { { delays: [0, 10, 60], retryable_exceptions: [RuntimeError] } }
 
       it { is_expected.to_not raise_error }
     end
@@ -70,13 +72,13 @@ RSpec.describe ActiveJob::Retry::VariableOptionsValidator do
       it { is_expected.to raise_error(ActiveJob::Retry::InvalidConfigurationError) }
     end
 
-    context 'bad retry exceptions' do
-      let(:options) { { retry_exceptions: [:runtime] } }
+    context 'bad retryable_exceptions' do
+      let(:options) { { retryable_exceptions: [:runtime] } }
       it { is_expected.to raise_error(ActiveJob::Retry::InvalidConfigurationError) }
     end
 
     context 'retry and fatal exceptions together' do
-      let(:options) { { fatal_exceptions: [StandardError], retry_exceptions: [] } }
+      let(:options) { { fatal_exceptions: [StandardError], retryable_exceptions: [] } }
       it { is_expected.to raise_error(ActiveJob::Retry::InvalidConfigurationError) }
     end
   end

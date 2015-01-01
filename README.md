@@ -14,7 +14,7 @@ class ProcessWebhook < ActiveJob::Base
   queue_as :webhooks
 
   # Constant delay between attempts:
-  constant_retry limit: 3, delay: 5, retry_exceptions: [TimeoutError, NetworkError]
+  constant_retry limit: 3, delay: 5, retryable_exceptions: [TimeoutError, NetworkError]
 
   # Or, variable delay between attempts:
   variable_retry delays: [1, 5, 10, 30]
@@ -50,7 +50,7 @@ end
 `delay`
 :    Time between attempts (default: 0).
 
-`retry_exceptions`
+`retryable_exceptions`
 :    A whitelist of exceptions to retry (default: nil, i.e. all exceptions will result in a retry).
 
 `fatal_exceptions`
@@ -67,7 +67,7 @@ end
 `max_delay_multiplier`
 :    The other end of the range for `min_delay_multiplier`. If one is supplied, both must be.
 
-`retry_exceptions`
+`retryable_exceptions`
 :    Same as for `constant_retry`.
 
 `fatal_exceptions`
