@@ -94,11 +94,10 @@ module ActiveJob
     def retry_or_reraise(exception)
       raise exception unless self.class.retrier.should_retry?(retry_attempt, exception)
 
-      @retry_attempt += 1
-
       this_delay = self.class.retrier.retry_delay(retry_attempt, exception)
       # TODO This breaks DelayedJob and Resque for some weird ActiveSupport reason.
       # logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
+      @retry_attempt += 1
       retry_job(wait: this_delay)
 
       true # Exception has been handled

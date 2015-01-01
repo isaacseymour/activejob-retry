@@ -129,9 +129,10 @@ RSpec.describe ActiveJob::Retry do
 
     context 'when the job should be retried' do
       before do
-        expect(retrier).to receive(:should_retry?).
-          with(1, instance_of(RuntimeError)).
+        expect(retrier).to receive(:should_retry?).with(1, instance_of(RuntimeError)).
           and_return(true)
+        expect(retrier).to receive(:retry_delay).with(1, instance_of(RuntimeError)).
+          and_return(5)
       end
 
       it 'retries the job with the defined delay' do
