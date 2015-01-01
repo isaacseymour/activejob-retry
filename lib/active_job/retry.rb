@@ -1,6 +1,9 @@
 module ActiveJob
   module Retry
-    # If you want your job to retry on failure, simply include this module in your class:
+    class UnsupportedAdapterError < StandardError; end
+    SUPPORTED_ADAPTERS = %i(backburner delayed_job que resque sidekiq).freeze
+
+    # If you want your job to retry on failure, simply include this module in your class,
     #
     #   class DeliverWebHook < ActiveJob::Base
     #     include ActiveJob::Retry
@@ -16,6 +19,13 @@ module ActiveJob
     #     end
     #   end
     def self.included(base)
+      # This breaks all specs because the adapter gets set after class eval :(
+      # unless SUPPORTED_ADAPTERS.include?(ActiveJob::Base.queue_adapter)
+      #   raise UnsupportedAdapterError,
+      #         "Only Backburner, DelayedJob, Que, Resque, and Sidekiq support delayed " \
+      #         "retries. #{ActiveJob::Base.queue_adapter} is not supported."
+      # end
+
       base.extend(ClassMethods)
     end
 
@@ -112,7 +122,8 @@ module ActiveJob
       raise exception unless should_retry?(exception)
 
       this_delay = retry_delay
-      logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
+      # This breaks DelayedJob and Resque for some weird ActiveSupport reason.
+      # logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
       retry_job(wait: this_delay)
     end
   end
