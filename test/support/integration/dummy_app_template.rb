@@ -15,7 +15,7 @@ class TestJob < ActiveJob::Base
   include ActiveJob::Retry
 
   queue_as :integration_tests
-  fixed_retry limit: 2, delay: 3
+  constant_retry limit: 2, delay: 3
 
   def perform(x, fail_first = false)
     raise "Failing first" if fail_first && retry_attempt == 1

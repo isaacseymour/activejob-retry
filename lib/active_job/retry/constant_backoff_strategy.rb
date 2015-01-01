@@ -1,10 +1,10 @@
-require 'active_job/retry/fixed_options_validator'
+require 'active_job/retry/constant_options_validator'
 
 module ActiveJob
   module Retry
-    class FixedDelayRetrier
+    class ConstantBackoffStrategy
       def initialize(options)
-        FixedOptionsValidator.new(options).validate!
+        ConstantOptionsValidator.new(options).validate!
         @retry_limit      = options.fetch(:limit, 1)
         @retry_delay      = options.fetch(:delay, 0)
         @fatal_exceptions = options.fetch(:fatal_exceptions, [])

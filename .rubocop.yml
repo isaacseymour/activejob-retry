@@ -1,8 +1,11 @@
 AllCops:
   Include:
     - Rakefile
+    - lib/**/*
+    - spec/**/*
   Exclude:
     - .*/**/*
+    - .**/*
     - test/**/*
 
 LineLength:
@@ -16,3 +19,6 @@ Metrics/MethodLength:
 
 Style/Documentation:
   Enabled: false
+
+Style/DotPosition:
+  EnforcedStyle: trailing

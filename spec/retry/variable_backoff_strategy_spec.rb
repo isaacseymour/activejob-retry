@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-RSpec.describe ActiveJob::Retry::VariableDelayRetrier do
-  let(:retrier) { described_class.new(options) }
+RSpec.describe ActiveJob::Retry::VariableBackoffStrategy do
+  let(:backoff_strategy) { described_class.new(options) }
 
   describe '#should_retry?' do
-    subject { retrier.should_retry?(attempt, exception) }
+    subject { backoff_strategy.should_retry?(attempt, exception) }
     let(:attempt) { 1 }
     let(:exception) { RuntimeError.new }
 
     context 'when the strategy is empty' do
-      let(:options) { { strategy: [] } }
+      let(:options) { { delays: [] } }
 
       context '1st attempt' do
         let(:attempt) { 1 }
@@ -23,7 +23,7 @@ RSpec.describe ActiveJob::Retry::VariableDelayRetrier do
     end
 
     context 'when the strategy has 4 delays' do
-      let(:options) { { strategy: [0, 3, 5, 10] } }
+      let(:options) { { delays: [0, 3, 5, 10] } }
 
       context '1st attempt' do
         let(:attempt) { 1 }
@@ -42,7 +42,7 @@ RSpec.describe ActiveJob::Retry::VariableDelayRetrier do
     end
 
     context 'defaults (retry everything)' do
-      let(:options) { { strategy: [0, 3, 5, 10, 60] } }
+      let(:options) { { delays: [0, 3, 5, 10, 60] } }
 
       context 'Exception' do
         let(:exception) { Exception.new }
@@ -61,7 +61,7 @@ RSpec.describe ActiveJob::Retry::VariableDelayRetrier do
     end
 
     context 'with whitelist' do
-      let(:options) { { strategy: [10], retry_exceptions: [RuntimeError] } }
+      let(:options) { { delays: [10], retry_exceptions: [RuntimeError] } }
 
       context 'Exception' do
         let(:exception) { Exception.new }
@@ -80,7 +80,7 @@ RSpec.describe ActiveJob::Retry::VariableDelayRetrier do
     end
 
     context 'with blacklist' do
-      let(:options) { { strategy: [10], fatal_exceptions: [RuntimeError] } }
+      let(:options) { { delays: [10], fatal_exceptions: [RuntimeError] } }
 
       context 'Exception' do
         let(:exception) { Exception.new }
@@ -100,12 +100,12 @@ RSpec.describe ActiveJob::Retry::VariableDelayRetrier do
   end
 
   describe '#retry_delay' do
-    subject { retrier.retry_delay(attempt, exception) }
+    subject { backoff_strategy.retry_delay(attempt, exception) }
     let(:attempt) { 1 }
     let(:exception) { RuntimeError.new }
 
     context 'when the strategy has 4 delays' do
-      let(:options) { { strategy: [0, 3, 5, 10] } }
+      let(:options) { { delays: [0, 3, 5, 10] } }
 
       context '1st attempt' do
         let(:attempt) { 1 }

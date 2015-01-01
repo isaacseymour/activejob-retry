@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe ActiveJob::Retry::FixedDelayRetrier do
-  let(:retrier) { described_class.new(options) }
+RSpec.describe ActiveJob::Retry::ConstantBackoffStrategy do
+  let(:strategy) { described_class.new(options) }
 
   describe '#should_retry?' do
-    subject { retrier.should_retry?(attempt, exception) }
+    subject { strategy.should_retry?(attempt, exception) }
     let(:attempt) { 1 }
     let(:exception) { RuntimeError.new }
 

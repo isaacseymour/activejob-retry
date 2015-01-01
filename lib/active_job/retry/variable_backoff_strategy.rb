@@ -1,25 +1,25 @@
-require 'active_job/retry/fixed_delay_retrier'
+require 'active_job/retry/constant_backoff_strategy'
 require 'active_job/retry/variable_options_validator'
 
 module ActiveJob
   module Retry
-    class VariableDelayRetrier < FixedDelayRetrier
+    class VariableBackoffStrategy < ConstantBackoffStrategy
       def initialize(options)
         super(options)
         VariableOptionsValidator.new(options).validate!
-        @retry_limit          = options.fetch(:strategy).length + 1
-        @backoff_strategy     = options.fetch(:strategy)
+        @retry_limit          = options.fetch(:delays).length + 1
+        @retry_delays         = options.fetch(:delays)
         @min_delay_multiplier = options.fetch(:min_delay_multiplier, 1.0)
         @max_delay_multiplier = options.fetch(:max_delay_multiplier, 1.0)
       end
 
       def retry_delay(attempt, _exception)
-        (backoff_strategy[attempt - 1] * delay_multiplier).to_i
+        (retry_delays[attempt - 1] * delay_multiplier).to_i
       end
 
       private
 
-      attr_reader :backoff_strategy, :min_delay_multiplier, :max_delay_multiplier
+      attr_reader :retry_delays, :min_delay_multiplier, :max_delay_multiplier
 
       def random_delay?
         min_delay_multiplier != max_delay_multiplier

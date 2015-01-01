@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe ActiveJob::Retry::FixedOptionsValidator do
+RSpec.describe ActiveJob::Retry::ConstantOptionsValidator do
   let(:validator) { described_class.new(options) }
   subject(:validate!) { -> { validator.validate! } }
 
