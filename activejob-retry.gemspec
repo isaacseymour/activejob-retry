@@ -1,7 +1,4 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'active_job/retry/version'
+require File.expand_path('../lib/active_job/retry/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name = 'activejob-retry'
@@ -9,7 +6,7 @@ Gem::Specification.new do |s|
   s.date = Date.today.strftime('%Y-%m-%d')
   s.authors = ['Isaac Seymour']
   s.email = ['isaac@isaacseymour.co.uk']
-  s.summary = 'Automatically retry ActiveJobs, with exponential backoff.'
+  s.summary = 'Automatic retry functionality for ActiveJob.'
   s.description = <<-EOL
     activejob-retry provides automatic retry functionality for failed
     ActiveJobs, with exponential backoff.
@@ -21,7 +18,7 @@ Gem::Specification.new do |s|
     * Exponential backoff (varying the delay between retries).
     * Light and easy to override retry logic.
   EOL
-  s.homepage = 'http://github.com/isaacseymour/activejob-retry'
+  s.homepage = 'http://github.com/gocardless/activejob-retry'
   s.license = 'MIT'
 
   s.has_rdoc = false
