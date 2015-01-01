@@ -1,4 +1,4 @@
-ActiveJob::Retry
+ActiveJob::Retry [![Build Status](https://travis-ci.org/gocardless/activejob-retry.svg?branch=master)](https://travis-ci.org/gocardless/activejob-retry)
 ================
 
 Automatic retry functionality for ActiveJob.
