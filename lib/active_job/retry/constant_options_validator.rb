@@ -2,7 +2,7 @@ require 'active_job/retry/errors'
 
 module ActiveJob
   module Retry
-    class FixedOptionsValidator
+    class ConstantOptionsValidator
       def initialize(options)
         @options = options
       end

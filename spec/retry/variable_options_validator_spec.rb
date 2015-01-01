@@ -5,42 +5,42 @@ RSpec.describe ActiveJob::Retry::VariableOptionsValidator do
   subject(:validate!) { -> { validator.validate! } }
 
   context 'valid options' do
-    context 'empty strategy' do
-      let(:options) { { strategy: [] } }
+    context 'empty delays' do
+      let(:options) { { delays: [] } }
       it { is_expected.to_not raise_error }
     end
 
-    context 'with strategy' do
-      let(:options) { { strategy: [0, 3, 6, 10_000] } }
+    context 'with delays' do
+      let(:options) { { delays: [0, 3, 6, 10_000] } }
       it { is_expected.to_not raise_error }
     end
 
     context 'min and max delay multipliers' do
       let(:options) do
-        { strategy: [0, 10, 60], min_delay_multiplier: 0.8, max_delay_multiplier: 1.2 }
+        { delays: [0, 10, 60], min_delay_multiplier: 0.8, max_delay_multiplier: 1.2 }
       end
       it { is_expected.to_not raise_error }
     end
 
     context 'fatal exceptions' do
-      let(:options) { { strategy: [0, 10, 60], fatal_exceptions: [RuntimeError] } }
+      let(:options) { { delays: [0, 10, 60], fatal_exceptions: [RuntimeError] } }
       it { is_expected.to_not raise_error }
     end
 
     context 'retry exceptions' do
-      let(:options) { { strategy: [], retry_exceptions: [StandardError, NoMethodError] } }
+      let(:options) { { delays: [], retry_exceptions: [StandardError, NoMethodError] } }
       it { is_expected.to_not raise_error }
     end
 
     context 'multiple options' do
-      let(:options) { { strategy: [0, 10, 60], retry_exceptions: [RuntimeError] } }
+      let(:options) { { delays: [0, 10, 60], retry_exceptions: [RuntimeError] } }
 
       it { is_expected.to_not raise_error }
     end
   end
 
   context 'invalid options' do
-    context 'without a strategy' do
+    context 'without delays' do
       let(:options) { {} }
       it { is_expected.to raise_error(ActiveJob::Retry::InvalidConfigurationError) }
     end

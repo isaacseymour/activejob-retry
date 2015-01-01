@@ -2,7 +2,7 @@ require_relative '../support/job_buffer'
 
 class RescueJob < ActiveJob::Base
   include ActiveJob::Retry
-  fixed_retry limit: 2, delay: 0
+  constant_retry limit: 2, delay: 0
 
   class OtherError < StandardError; end
 

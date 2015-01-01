@@ -3,8 +3,8 @@ require 'active_support'
 require 'active_support/core_ext' # ActiveJob uses core exts, but doesn't require it
 require 'active_job/retry/version'
 require 'active_job/retry/errors'
-require 'active_job/retry/fixed_delay_retrier'
-require 'active_job/retry/variable_delay_retrier'
+require 'active_job/retry/constant_backoff_strategy'
+require 'active_job/retry/variable_backoff_strategy'
 
 unless ActiveJob::Base.method_defined?(:deserialize)
   require 'active_job/retry/deserialize_monkey_patch'
@@ -34,31 +34,31 @@ module ActiveJob
     #################
 
     module ClassMethods
-      attr_reader :retrier
+      attr_reader :backoff_strategy
 
-      def fixed_retry(options)
-        retry_with(FixedDelayRetrier.new(options))
+      def constant_retry(options)
+        retry_with(ConstantBackoffStrategy.new(options))
       end
 
       def variable_retry(options)
-        retry_with(VariableDelayRetrier.new(options))
+        retry_with(VariableBackoffStrategy.new(options))
       end
 
-      def retry_with(retrier)
-        unless retrier_valid?(retrier)
+      def retry_with(backoff_strategy)
+        unless backoff_strategy_valid?(backoff_strategy)
           raise InvalidConfigurationError,
-                'Retriers must define `should_retry?(attempt, exception)`, and ' \
-                '`retry_delay(attempt, exception)`.'
+                'Backoff strategies must define `should_retry?(attempt, exception)`, ' \
+                'and `retry_delay(attempt, exception)`.'
         end
 
-        @retrier = retrier
+        @backoff_strategy = backoff_strategy
       end
 
-      def retrier_valid?(retrier)
-        retrier.respond_to?(:should_retry?) &&
-          retrier.respond_to?(:retry_delay) &&
-          retrier.method(:should_retry?).arity == 2 &&
-          retrier.method(:retry_delay).arity == 2
+      def backoff_strategy_valid?(backoff_strategy)
+        backoff_strategy.respond_to?(:should_retry?) &&
+          backoff_strategy.respond_to?(:retry_delay) &&
+          backoff_strategy.method(:should_retry?).arity == 2 &&
+          backoff_strategy.method(:retry_delay).arity == 2
       end
     end
 
@@ -92,9 +92,11 @@ module ActiveJob
     private
 
     def retry_or_reraise(exception)
-      raise exception unless self.class.retrier.should_retry?(retry_attempt, exception)
+      unless self.class.backoff_strategy.should_retry?(retry_attempt, exception)
+        raise exception
+      end
 
-      this_delay = self.class.retrier.retry_delay(retry_attempt, exception)
+      this_delay = self.class.backoff_strategy.retry_delay(retry_attempt, exception)
       # TODO: This breaks DelayedJob and Resque for some weird ActiveSupport reason.
       # logger.log(Logger::INFO,
       #            "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
