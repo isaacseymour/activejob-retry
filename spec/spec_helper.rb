@@ -1,6 +1,5 @@
 require 'active_job-retry'
 require 'rspec/its'
-require 'pry'
 
 ActiveJob::Base.queue_adapter = :resque
 
