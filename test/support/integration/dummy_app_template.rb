@@ -10,9 +10,14 @@ CODE
 
 file 'app/jobs/test_job.rb', <<-CODE
 class TestJob < ActiveJob::Base
-  queue_as :integration_tests
+  include ActiveJob::Retry
 
-  def perform(x)
+  queue_as :integration_tests
+  retry_with limit: 2, delay: 3
+
+  def perform(x, fail_first = false)
+    raise "Failing first" if fail_first && retry_attempt == 1
+
     File.open(Rails.root.join("tmp/\#{x}"), "w+") do |f|
       f.write x
     end

@@ -13,8 +13,8 @@ module ActiveJob
     #
     #   class DeliverWebHook < ActiveJob::Base
     #     include ActiveJob::Retry
-    #     queue_as :web_hooks
     #
+    #     queue_as :web_hooks
     #     retry_with limit: 8,                         # default 1
     #                delay: 60,                        # default 0
     #                fatal_exceptions: [RuntimeError], # default [], i.e. none
