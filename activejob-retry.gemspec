@@ -29,7 +29,9 @@ Gem::Specification.new do |s|
   s.require_paths = %w[lib]
 
   s.add_dependency('activejob', '>= 4.2')
+  s.add_dependency('activesupport', '>= 4.2')
 
+  s.add_development_dependency('rake', ' >= 10.3')
   s.add_development_dependency('rspec')
   s.add_development_dependency('rspec-its')
   s.add_development_dependency('pry-byebug')
