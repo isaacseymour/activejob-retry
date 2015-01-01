@@ -14,7 +14,7 @@ else
   require "adapters/#{@adapter}"
 end
 
-require 'active_job-retry'
+require 'active_job/retry'
 
 require 'active_support/testing/autorun'
 

@@ -1,10 +1,9 @@
+require 'active_job/retry/errors'
+
 module ActiveJob
   module Retry
-    class ExponentialOptionsValidator
-      DELAY_MULTIPLIER_KEYS = [
-        :min_delay_multiplier,
-        :max_delay_multiplier
-      ].freeze
+    class VariableOptionsValidator
+      DELAY_MULTIPLIER_KEYS = [:min_delay_multiplier, :max_delay_multiplier].freeze
 
       def initialize(options)
         @options = options
@@ -24,8 +23,6 @@ module ActiveJob
         unless options[:strategy]
           raise InvalidConfigurationError, "You must define a backoff strategy"
         end
-
-        return unless retry_limit
 
         unless retry_limit > 0
           raise InvalidConfigurationError,

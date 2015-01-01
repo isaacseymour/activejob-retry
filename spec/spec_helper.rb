@@ -1,4 +1,4 @@
-require 'active_job-retry'
+require 'active_job/retry'
 require 'rspec/its'
 
 ActiveJob::Base.queue_adapter = :resque
