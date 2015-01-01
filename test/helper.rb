@@ -4,7 +4,6 @@ Bundler.setup
 require 'active_job'
 require 'support/job_buffer'
 
-require 'pry'
 GlobalID.app = 'aj'
 
 @adapter  = ENV['AJADAPTER'] || 'resque'
