@@ -1,6 +1,6 @@
 require 'active_job'
 require 'active_support'
-require 'active_support/core_ext/hash/indifferent_access'
+require 'active_support/core_ext' # ActiveJob uses core exts, but doesn't require it
 require 'active_job/retry/version'
 require 'active_job/retry/errors'
 require 'active_job/retry/fixed_delay_retrier'
