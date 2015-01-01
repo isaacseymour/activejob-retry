@@ -1,7 +1,7 @@
 ActiveJob::Retry
 ================
 
-Automatically retry ActiveJobs, with exponential backoff.
+Automatic retry functionality for ActiveJob.
 
 ```ruby
 class ProcessWebhook < ActiveJob::Base
