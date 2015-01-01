@@ -40,7 +40,7 @@ class ProcessWebhook < ActiveJob::Base
 end
 ```
 
-#### `constant_retry` options
+#### constant_retry options
 `limit`
 :    Maximum number of times to attempt the job (default: 1).
 
@@ -56,7 +56,7 @@ end
 `fatal_exceptions`
 :    A blacklist of exceptions to not retry (default: []).
 
-#### `variable_retry` options
+#### variable_retry options
 
 `delays`
 :    __required__ An array of delays between attempts. The first attempt will occur whenever you originally enqueued the job to happen.
