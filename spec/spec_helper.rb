@@ -2,6 +2,8 @@ require 'active_job-retry'
 require 'rspec/its'
 require 'pry'
 
+ActiveJob::Base.queue_adapter = :resque
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
