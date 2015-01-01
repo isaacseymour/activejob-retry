@@ -31,8 +31,11 @@ module ActiveJob
       end
 
       def retry_exception?(exception)
-        return exception_whitelisted?(exception) unless retry_exceptions.nil?
-        !exception_blacklisted?(exception)
+        if retry_exceptions.nil?
+          !exception_blacklisted?(exception)
+        else
+          exception_whitelisted?(exception)
+        end
       end
 
       def exception_whitelisted?(exception)
