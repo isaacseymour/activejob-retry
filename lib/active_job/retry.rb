@@ -3,11 +3,11 @@ module ActiveJob
     class UnsupportedAdapterError < StandardError; end
 
     SUPPORTED_ADAPTERS = [
-      ActiveJob::QueueAdapters::ResqueAdapter,
-      ActiveJob::QueueAdapters::DelayedJobAdapter,
-      ActiveJob::QueueAdapters::BackburnerAdapter,
-      ActiveJob::QueueAdapters::QueAdapter,
-    ]
+      'ActiveJob::QueueAdapters::BackburnerAdapter',
+      'ActiveJob::QueueAdapters::DelayedJobAdapter',
+      'ActiveJob::QueueAdapters::ResqueAdapter',
+      'ActiveJob::QueueAdapters::QueAdapter'
+    ].freeze
 
     # If you want your job to retry on failure, simply include this module in your class,
     #
@@ -25,7 +25,7 @@ module ActiveJob
     #     end
     #   end
     def self.included(base)
-      unless SUPPORTED_ADAPTERS.include?(ActiveJob::Base.queue_adapter)
+      unless SUPPORTED_ADAPTERS.include?(ActiveJob::Base.queue_adapter.to_s)
         raise UnsupportedAdapterError,
               "Only Backburner, DelayedJob, Que, and Resque support delayed " \
               "retries. #{ActiveJob::Base.queue_adapter} is not supported."
