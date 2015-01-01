@@ -12,7 +12,7 @@ module ActiveJob
     #                retry_exceptions: [TimeoutError]  # default nil, i.e. all
     #
     #     def perform(url, web_hook_id, hmac_key)
-    #       work!
+    #       # Do work
     #     end
     #   end
     def self.included(base)
@@ -20,14 +20,13 @@ module ActiveJob
     end
 
     module ClassMethods
-      # Setup DSL
       def retry_with(options)
         OptionsValidator.new(options).validate!
 
-        @retry_limit      = options[:limit]            if options[:limit]
-        @retry_delay      = options[:delay]            if options[:delay]
-        @fatal_exceptions = options[:fatal_exceptions] if options[:fatal_exceptions]
-        @retry_exceptions = options[:retry_exceptions] if options[:retry_exceptions]
+        @retry_limit      = options[:limit]
+        @retry_delay      = options[:delay]
+        @fatal_exceptions = options[:fatal_exceptions]
+        @retry_exceptions = options[:retry_exceptions]
       end
 
       ############
