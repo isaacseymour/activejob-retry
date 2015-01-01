@@ -4,6 +4,9 @@
 # of the deserialization as possible to the instance, i.e. `ActiveJob::Base#deserialize`,
 # which can be overridden. This allows us to store extra information in the queue (i.e.
 # retry_attempt), which is essential for ActiveJob::Retry.
+#
+# This monkey patch is automatically applied if necessary when ActiveJob::Retry is
+# required.
 
 raise "Unnecessary monkey patch!" if ActiveJob::Base.method_defined?(:deserialize)
 

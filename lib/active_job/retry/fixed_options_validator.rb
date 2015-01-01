@@ -1,6 +1,8 @@
+require 'active_job/retry/errors'
+
 module ActiveJob
   module Retry
-     class OptionsValidator
+     class FixedOptionsValidator
       def initialize(options)
         @options = options
       end

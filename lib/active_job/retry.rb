@@ -1,7 +1,17 @@
+require 'active_job'
+require 'active_support'
+require 'active_support/core_ext' # ActiveJob uses core exts, but doesn't require it
+require 'active_job/retry/version'
+require 'active_job/retry/errors'
+require 'active_job/retry/fixed_delay_retrier'
+require 'active_job/retry/variable_delay_retrier'
+
+unless ActiveJob::Base.method_defined?(:deserialize)
+  require 'active_job/retry/deserialize_monkey_patch'
+end
+
 module ActiveJob
   module Retry
-    class UnsupportedAdapterError < StandardError; end
-
     SUPPORTED_ADAPTERS = [
       'ActiveJob::QueueAdapters::BackburnerAdapter',
       'ActiveJob::QueueAdapters::DelayedJobAdapter',
@@ -9,21 +19,6 @@ module ActiveJob
       'ActiveJob::QueueAdapters::QueAdapter'
     ].freeze
 
-    # If you want your job to retry on failure, simply include this module in your class,
-    #
-    #   class DeliverWebHook < ActiveJob::Base
-    #     include ActiveJob::Retry
-    #
-    #     queue_as :web_hooks
-    #     retry_with limit: 8,                         # default 1
-    #                delay: 60,                        # default 0
-    #                fatal_exceptions: [RuntimeError], # default [], i.e. none
-    #                retry_exceptions: [TimeoutError]  # default nil, i.e. all
-    #
-    #     def perform(url, web_hook_id, hmac_key)
-    #       # Do work
-    #     end
-    #   end
     def self.included(base)
       unless SUPPORTED_ADAPTERS.include?(ActiveJob::Base.queue_adapter.to_s)
         raise UnsupportedAdapterError,
@@ -34,58 +29,45 @@ module ActiveJob
       base.extend(ClassMethods)
     end
 
+    #################
+    # Configuration #
+    #################
+
     module ClassMethods
-      def retry_with(options)
-        OptionsValidator.new(options).validate!
+      attr_reader :retrier
 
-        @retry_limit      = options[:limit]
-        @retry_delay      = options[:delay]
-        @fatal_exceptions = options[:fatal_exceptions]
-        @retry_exceptions = options[:retry_exceptions]
+      def fixed_retry(options)
+        retry_with(FixedDelayRetrier.new(options))
       end
 
-      ############
-      # Defaults #
-      ############
-      def retry_limit
-        @retry_limit ||= 1
+      def variable_retry(options)
+        retry_with(VariableDelayRetrier.new(options))
       end
 
-      def retry_delay
-        @retry_delay ||= 0
+      def retry_with(retrier)
+        unless retrier_valid?(retrier)
+          raise InvalidConfigurationError,
+                "Retriers must define `should_retry?(attempt, exception)`, and " \
+                "`retry_delay(attempt, exception)`."
+        end
+
+        @retrier = retrier
       end
 
-      def fatal_exceptions
-        @fatal_exceptions ||= []
-      end
-
-      def retry_exceptions
-        @retry_exceptions ||= nil
-      end
-
-      #################
-      # Retry helpers #
-      #################
-      def retry_exception?(exception)
-        return true if retry_exceptions.nil? && fatal_exceptions.empty?
-        return exception_whitelisted?(exception) unless retry_exceptions.nil?
-        !exception_blacklisted?(exception)
-      end
-
-      def exception_whitelisted?(exception)
-        retry_exceptions.any? { |ex| exception.is_a?(ex) }
-      end
-
-      def exception_blacklisted?(exception)
-        fatal_exceptions.any? { |ex| exception.is_a?(ex) }
+      def retrier_valid?(retrier)
+        retrier.respond_to?(:should_retry?) &&
+          retrier.respond_to?(:retry_delay) &&
+          retrier.method(:should_retry?).arity == 2 &&
+          retrier.method(:retry_delay).arity == 2
       end
     end
 
-    #############
-    # Overrides #
-    #############
+    #############################
+    # Storage of attempt number #
+    #############################
+
     def serialize
-      super.merge('retry_attempt' => retry_attempt + 1)
+      super.merge('retry_attempt' => retry_attempt)
     end
 
     def deserialize(job_data)
@@ -93,43 +75,32 @@ module ActiveJob
       @retry_attempt = job_data['retry_attempt']
     end
 
+    def retry_attempt
+      @retry_attempt ||= 1
+    end
+
+    ##########################
+    # Performing the retries #
+    ##########################
+
     # Override `rescue_with_handler` to make sure our catch is the last one, and doesn't
     # happen if the exception has already been caught in a `rescue_from`
     def rescue_with_handler(exception)
       super || retry_or_reraise(exception)
     end
 
-    ##################
-    # Retrying logic #
-    ##################
-    def retry_attempt
-      @retry_attempt ||= 0
-    end
-
-    # Override me if you want more complex behaviour
-    def retry_delay
-      self.class.retry_delay
-    end
-
-    def should_retry?(exception)
-      return false if retry_limit_reached?
-      return false unless self.class.retry_exception?(exception)
-      true
-    end
-
-    def retry_limit_reached?
-      return true if self.class.retry_limit == 0
-      return false if self.class.retry_limit == -1
-      retry_attempt >= self.class.retry_limit
-    end
+    private
 
     def retry_or_reraise(exception)
-      raise exception unless should_retry?(exception)
+      raise exception unless self.class.retrier.should_retry?(retry_attempt, exception)
 
-      this_delay = retry_delay
-      # This breaks DelayedJob and Resque for some weird ActiveSupport reason.
+      this_delay = self.class.retrier.retry_delay(retry_attempt, exception)
+      # TODO This breaks DelayedJob and Resque for some weird ActiveSupport reason.
       # logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
+      @retry_attempt += 1
       retry_job(wait: this_delay)
+
+      true # Exception has been handled
     end
   end
 end

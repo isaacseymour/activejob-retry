@@ -1,17 +1,16 @@
+require 'active_job/retry/errors'
+
 module ActiveJob
   module Retry
-    class ExponentialOptionsValidator
-      DELAY_MULTIPLIER_KEYS = [
-        :min_delay_multiplier,
-        :max_delay_multiplier
-      ].freeze
+    class VariableOptionsValidator
+      DELAY_MULTIPLIER_KEYS = [:min_delay_multiplier, :max_delay_multiplier].freeze
 
       def initialize(options)
         @options = options
-        @retry_limit = options[:limit] || options.fetch(:strategy, []).length
       end
 
       def validate!
+        validate_banned_basic_options!
         validate_strategy!
         validate_delay_multipliers!
       end
@@ -20,21 +19,20 @@ module ActiveJob
 
       attr_reader :options, :retry_limit
 
+      def validate_banned_basic_options!
+        if options[:limit]
+          raise InvalidConfigurationError, "Cannot use limit with VariableDelayRetrier"
+        end
+
+        if options[:delay]
+          raise InvalidConfigurationError, "Cannot use delay with VariableDelayRetrier"
+        end
+      end
+
       def validate_strategy!
         unless options[:strategy]
           raise InvalidConfigurationError, "You must define a backoff strategy"
         end
-
-        return unless retry_limit
-
-        unless retry_limit > 0
-          raise InvalidConfigurationError,
-                "Exponential backoff cannot be used with infinite or no retries"
-        end
-
-        return if options[:strategy].length == retry_limit
-
-        raise InvalidConfigurationError, "Strategy must have a delay for each retry"
       end
 
       def validate_delay_multipliers!

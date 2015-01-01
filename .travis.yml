@@ -17,3 +17,6 @@ rvm:
 script:
   - bundle exec rspec spec
   - bundle exec rake test
+
+services:
+  - redis
