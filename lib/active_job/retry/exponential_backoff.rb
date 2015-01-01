@@ -43,17 +43,17 @@ module ActiveJob
           retry_with(options)
           ExponentialOptionsValidator.new(options).validate!
 
-          @retry_limit          = options[:limit] || options[:strategy].length if options[:strategy]
-          @backoff_strategy     = options[:strategy]             if options[:strategy]
-          @min_delay_multiplier = options[:min_delay_multiplier] if options[:min_delay_multiplier]
-          @max_delay_multiplier = options[:max_delay_multiplier] if options[:max_delay_multiplier]
+          @retry_limit          = options[:limit] || options[:strategy].try(:length)
+          @backoff_strategy     = options[:strategy]
+          @min_delay_multiplier = options[:min_delay_multiplier]
+          @max_delay_multiplier = options[:max_delay_multiplier]
         end
 
         ############
         # Defaults #
         ############
         def retry_limit
-          @retry_limit ||= (backoff_strategy || []).length
+          @retry_limit ||= backoff_strategy.try(:length)
         end
 
         def backoff_strategy
