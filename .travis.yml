@@ -17,6 +17,11 @@ rvm:
 script:
   - bundle exec rspec spec
   - bundle exec rake test
+  - bundle exec rake test:integration
 
 services:
   - redis
+  - rabbitmq
+
+addons:
+  postgresql: "9.4"
