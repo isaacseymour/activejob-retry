@@ -9,14 +9,14 @@ Gem::Specification.new do |s|
   s.date = Date.today.strftime('%Y-%m-%d')
   s.authors = ['Isaac Seymour']
   s.email = ['isaac@isaacseymour.co.uk']
-  s.summary = 'Automatic retrying DSL for ActiveJob'
+  s.summary = 'Automatically retry ActiveJobs, with exponential backoff.'
   s.description = <<-EOL
-    activejob-retry provides a simple DSL for automatically retrying ActiveJobs when they
-    fail, with exponential backoff.
+    activejob-retry provides automatic retry functionality for failed
+    ActiveJobs, with exponential backoff.
 
     Features:
 
-    * (Should) work with any queue adapter that supports retries.
+    * Works with any queue adapter that supports retries.
     * Whitelist/blacklist exceptions to retry on.
     * Exponential backoff (varying the delay between retries).
     * Light and easy to override retry logic.
