@@ -15,5 +15,6 @@ group :test, :integration do
 
   # Specs
   gem 'sqlite3'
+  gem 'pg'
   gem 'rails'
 end
