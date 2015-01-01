@@ -5,8 +5,8 @@ RSpec.describe ActiveJob::Retry::ConstantOptionsValidator do
   subject(:validate!) { -> { validator.validate! } }
 
   context 'valid options' do
-    context 'infinite retries' do
-      let(:options) { { limit: -1, infinite_job: true } }
+    context 'unlimited retries' do
+      let(:options) { { limit: nil, unlimited_retries: true } }
       it { is_expected.to_not raise_error }
     end
 
@@ -44,12 +44,17 @@ RSpec.describe ActiveJob::Retry::ConstantOptionsValidator do
 
   context 'invalid options' do
     context 'bad limit' do
-      let(:options) { { limit: -2 } }
+      let(:options) { { limit: -1 } }
       it { is_expected.to raise_error(ActiveJob::Retry::InvalidConfigurationError) }
     end
 
     context 'accidental infinite limit' do
-      let(:options) { { limit: -1 } }
+      let(:options) { { limit: nil } }
+      it { is_expected.to raise_error(ActiveJob::Retry::InvalidConfigurationError) }
+    end
+
+    context 'accidental finite limit' do
+      let(:options) { { unlimited_retries: true } }
       it { is_expected.to raise_error(ActiveJob::Retry::InvalidConfigurationError) }
     end
 

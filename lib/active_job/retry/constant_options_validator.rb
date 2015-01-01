@@ -23,23 +23,28 @@ module ActiveJob
 
       attr_reader :options
 
-      # Limit must be an integer >= -1
+      # Limit must be an integer >= 0, or nil
       def validate_limit_numericality!
         return unless options[:limit]
+        return if options[:limit].is_a?(Fixnum) && options[:limit] >= 0
 
-        unless options[:limit].is_a?(Fixnum)
-          raise InvalidConfigurationError, 'Limit must be an integer'
-        end
-
-        raise InvalidConfigurationError, 'Limit must be >= -1' if options[:limit] < -1
+        raise InvalidConfigurationError,
+              'Limit must be an integer >= 0, or nil for unlimited retries'
       end
 
-      # If it is -1 you *must* set `infinite_job: true` and understand that you're
-      # entering a world of pain and your ops team might hurt you.
+      # If no limit is supplied, you *must* set `unlimited_retries: true` and
+      # understand that your ops team might hurt you.
       def validate_infinite_limit!
-        return unless options[:limit] == -1 && options[:infinite_job].nil?
-        raise InvalidConfigurationError,
-              'You must set `infinite_job: true` to use an infinite job'
+        limit = options.fetch(:limit, 1)
+        return unless limit.nil? ^ options[:unlimited_retries] == true
+
+        if limit.nil? && options[:unlimited_retries] != true
+          raise InvalidConfigurationError,
+                'You must set `unlimited_retries: true` to use `limit: nil`'
+        else
+          raise InvalidConfigurationError,
+                'You must set `limit: nil` to have unlimited retries'
+        end
       end
 
       # Delay must be non-negative

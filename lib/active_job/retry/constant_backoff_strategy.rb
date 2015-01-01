@@ -26,7 +26,7 @@ module ActiveJob
       attr_reader :retry_limit, :fatal_exceptions, :retry_exceptions
 
       def retry_limit_reached?(attempt)
-        return false if retry_limit == -1
+        return false unless retry_limit
         attempt >= retry_limit
       end
 
