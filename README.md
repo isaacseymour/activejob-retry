@@ -1,7 +1,7 @@
 ActiveJob::Retry
 ================
 
-A DSL for automatically retrying ActiveJobs, with exponential backoff.
+Automatically retry ActiveJobs, with exponential backoff.
 
 ```ruby
 class ProcessWebhook < ActiveJob::Base
@@ -43,5 +43,4 @@ Contributing
   * Fork the project.
   * Make your feature addition or bug fix.
   * Add tests for it.
-  * Document it in the CHANGELOG.md.
   * Open a PR.
