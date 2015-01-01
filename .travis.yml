@@ -15,6 +15,7 @@ rvm:
   - rbx-2
 
 script:
+  - bundle exec rubocop
   - bundle exec rspec spec
   - bundle exec rake test
   - bundle exec rake test:integration

@@ -22,8 +22,8 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
 
   s.has_rdoc = false
-  s.files = `git ls-files`.split($/)
-  s.require_paths = %w[lib]
+  s.files = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  s.require_paths = %w(lib)
 
   s.add_dependency('activejob', '>= 4.2')
   s.add_dependency('activesupport', '>= 4.2')
@@ -31,4 +31,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rake', ' >= 10.3')
   s.add_development_dependency('rspec')
   s.add_development_dependency('rspec-its')
+  s.add_development_dependency('rubocop')
 end

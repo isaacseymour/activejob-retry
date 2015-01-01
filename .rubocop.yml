@@ -1,0 +1,18 @@
+AllCops:
+  Include:
+    - Rakefile
+  Exclude:
+    - .*/**/*
+    - test/**/*
+
+LineLength:
+  Max: 90
+
+Style/SignalException:
+  EnforcedStyle: 'only_raise'
+
+Metrics/MethodLength:
+  CountComments: false
+
+Style/Documentation:
+  Enabled: false
