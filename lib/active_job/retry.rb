@@ -22,7 +22,7 @@ module ActiveJob
     def self.included(base)
       unless SUPPORTED_ADAPTERS.include?(ActiveJob::Base.queue_adapter.to_s)
         raise UnsupportedAdapterError,
-              "Only Backburner, DelayedJob, Que, and Resque support delayed " \
+              'Only Backburner, DelayedJob, Que, and Resque support delayed ' \
               "retries. #{ActiveJob::Base.queue_adapter} is not supported."
       end
 
@@ -47,8 +47,8 @@ module ActiveJob
       def retry_with(retrier)
         unless retrier_valid?(retrier)
           raise InvalidConfigurationError,
-                "Retriers must define `should_retry?(attempt, exception)`, and " \
-                "`retry_delay(attempt, exception)`."
+                'Retriers must define `should_retry?(attempt, exception)`, and ' \
+                '`retry_delay(attempt, exception)`.'
         end
 
         @retrier = retrier
@@ -95,8 +95,9 @@ module ActiveJob
       raise exception unless self.class.retrier.should_retry?(retry_attempt, exception)
 
       this_delay = self.class.retrier.retry_delay(retry_attempt, exception)
-      # TODO This breaks DelayedJob and Resque for some weird ActiveSupport reason.
-      # logger.log(Logger::INFO, "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
+      # TODO: This breaks DelayedJob and Resque for some weird ActiveSupport reason.
+      # logger.log(Logger::INFO,
+      #            "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
       @retry_attempt += 1
       retry_job(wait: this_delay)
 

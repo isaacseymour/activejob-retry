@@ -23,7 +23,7 @@ namespace :test do
   end
 
   task 'env:integration' do
-    ENV['AJ_INTEGRATION_TESTS'] = "1"
+    ENV['AJ_INTEGRATION_TESTS'] = '1'
   end
 
   ACTIVEJOB_ADAPTERS.each do |adapter|
@@ -35,7 +35,7 @@ namespace :test do
       t.test_files = FileList['test/cases/**/*_test.rb']
       t.verbose = true
       t.warning = true
-      t.ruby_opts = ["--dev"] if defined?(JRUBY_VERSION)
+      t.ruby_opts = ['--dev'] if defined?(JRUBY_VERSION)
     end
 
     namespace :isolated do
@@ -43,19 +43,20 @@ namespace :test do
         dir = File.dirname(__FILE__)
         Dir.glob("#{dir}/test/cases/**/*_test.rb").all? do |file|
           sh(Gem.ruby, '-w', "-I#{dir}/lib", "-I#{dir}/test", file)
-        end or raise 'Failures'
+        end || raise('Failures')
       end
     end
 
     namespace :integration do
-      Rake::TestTask.new(adapter => ["test:env:#{adapter}", 'test:env:integration']) do |t|
-        t.description = "Run integration tests for #{adapter}"
-        t.libs << 'test'
-        t.test_files = FileList['test/integration/**/*_test.rb']
-        t.verbose = true
-        t.warning = true
-        t.ruby_opts = ["--dev"] if defined?(JRUBY_VERSION)
-      end
+      Rake::TestTask.new(
+        adapter => ["test:env:#{adapter}", 'test:env:integration']) do |t|
+          t.description = "Run integration tests for #{adapter}"
+          t.libs << 'test'
+          t.test_files = FileList['test/integration/**/*_test.rb']
+          t.verbose = true
+          t.warning = true
+          t.ruby_opts = ['--dev'] if defined?(JRUBY_VERSION)
+        end
     end
   end
 end
@@ -66,7 +67,7 @@ def run_without_aborting(tasks)
   tasks.each do |task|
     begin
       Rake::Task[task].invoke
-    rescue Exception
+    rescue StandardError
       errors << task
     end
   end

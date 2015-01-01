@@ -2,7 +2,7 @@ module QueJobsManager
   def setup
     require 'sequel'
     ActiveJob::Base.queue_adapter = :que
-    que_url = ENV['QUE_DATABASE_URL'] || 'postgres:///active_jobs_que_int_test'
+    que_url = ENV['QUE_DATABASE_URL'] || 'postgres:///dummy_test'
     uri = URI.parse(que_url)
     user = uri.user||ENV['USER']
     pass = uri.password

@@ -5,7 +5,7 @@ RSpec.describe ActiveJob::Retry do
     Class.new(ActiveJob::Base) do
       include ActiveJob::Retry
 
-      def perform(*args)
+      def perform(*_args)
         raise RuntimeError
       end
     end
@@ -21,8 +21,8 @@ RSpec.describe ActiveJob::Retry do
       let(:options) { { limit: -2 } }
 
       specify do
-        expect { job.fixed_retry(options) }.
-          to raise_error(ActiveJob::Retry::InvalidConfigurationError)
+        expect { job.fixed_retry(options) }
+          .to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
     end
   end
@@ -37,26 +37,25 @@ RSpec.describe ActiveJob::Retry do
       let(:options) { {} }
 
       specify do
-        expect { job.variable_retry(options) }.
-          to raise_error(ActiveJob::Retry::InvalidConfigurationError)
+        expect { job.variable_retry(options) }
+          .to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
     end
   end
 
   describe '.retry_with' do
     it 'rejects invalid retriers' do
-      expect { job.retry_with(Object.new) }.
-        to raise_error(ActiveJob::Retry::InvalidConfigurationError)
+      expect { job.retry_with(Object.new) }
+        .to raise_error(ActiveJob::Retry::InvalidConfigurationError)
     end
 
     it 'sets the retrier when it is valid' do
       module CustomRetrier
-        extend self
-        def should_retry?(attempt, exception)
+        def self.should_retry?(_attempt, _exception)
           true
         end
 
-        def retry_delay(attempt, exception)
+        def self.retry_delay(_attempt, _exception)
           5
         end
       end
@@ -129,10 +128,10 @@ RSpec.describe ActiveJob::Retry do
 
     context 'when the job should be retried' do
       before do
-        expect(retrier).to receive(:should_retry?).with(1, instance_of(RuntimeError)).
-          and_return(true)
-        expect(retrier).to receive(:retry_delay).with(1, instance_of(RuntimeError)).
-          and_return(5)
+        expect(retrier).to receive(:should_retry?).with(1, instance_of(RuntimeError))
+          .and_return(true)
+        expect(retrier).to receive(:retry_delay).with(1, instance_of(RuntimeError))
+          .and_return(5)
       end
 
       it 'retries the job with the defined delay' do
@@ -147,8 +146,8 @@ RSpec.describe ActiveJob::Retry do
       end
 
       pending 'logs the retry' do
-        expect(ActiveJob::Base.logger).to receive(:log).
-          with(Logger::INFO, 'Retrying (attempt 1, waiting 0s)')
+        expect(ActiveJob::Base.logger).to receive(:log)
+          .with(Logger::INFO, 'Retrying (attempt 1, waiting 0s)')
 
         perform
       end
@@ -156,9 +155,9 @@ RSpec.describe ActiveJob::Retry do
 
     context 'when the job should not be retried' do
       before do
-        expect(retrier).to receive(:should_retry?).
-          with(1, instance_of(RuntimeError)).
-          and_return(false)
+        expect(retrier).to receive(:should_retry?)
+          .with(1, instance_of(RuntimeError))
+          .and_return(false)
       end
 
       it 'does not retry the job' do
