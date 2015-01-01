@@ -17,7 +17,7 @@ module ActiveJob
         true
       end
 
-      def retry_delay(_, _)
+      def retry_delay(_attempt, _exception)
         @retry_delay
       end
 
@@ -26,13 +26,11 @@ module ActiveJob
       attr_reader :retry_limit, :fatal_exceptions, :retry_exceptions
 
       def retry_limit_reached?(attempt)
-        return true if retry_limit == 0
         return false if retry_limit == -1
         attempt >= retry_limit
       end
 
       def retry_exception?(exception)
-        return true if retry_exceptions.nil? && fatal_exceptions.empty?
         return exception_whitelisted?(exception) unless retry_exceptions.nil?
         !exception_blacklisted?(exception)
       end

@@ -17,7 +17,7 @@ class ProcessWebhook < ActiveJob::Base
               # fatal_exceptions: [StandardError] # Never catch these errors (default: none)
 
   # Variable delay between attempts
-  variable_retry strategy: [1, 5, 10, 30, 60] # Delay for 1, 5, ... seconds between subsequent retries
+  variable_retry strategy: [1, 5, 10, 30, 60] # Delay for 1, 5, ... seconds between subsequent retries (note that n delays means n+1 attempts)
                  min_delay_multiplier: 0.8,   # Multiply each delay by a random number between
                  max_delay_multiplier: 1.2    # 0.8 and 1.2 (rounded to nearest second)
 

@@ -7,16 +7,14 @@ module ActiveJob
       def initialize(options)
         super(options)
         VariableOptionsValidator.new(options).validate!
-        @retry_limit          = options.fetch(:strategy).length
+        @retry_limit          = options.fetch(:strategy).length + 1
         @backoff_strategy     = options.fetch(:strategy)
         @min_delay_multiplier = options.fetch(:min_delay_multiplier, 1.0)
         @max_delay_multiplier = options.fetch(:max_delay_multiplier, 1.0)
-        @fatal_exceptions     = options.fetch(:fatal_exceptions, [])
-        @retry_exceptions     = options.fetch(:retry_exceptions, nil)
       end
 
-      def retry_delay(attempt, _)
-        (backoff_strategy[attempt] * delay_multiplier).to_i
+      def retry_delay(attempt, _exception)
+        (backoff_strategy[attempt - 1] * delay_multiplier).to_i
       end
 
       private
