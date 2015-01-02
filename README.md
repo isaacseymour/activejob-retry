@@ -56,8 +56,8 @@ end
 | `delays`               |         | __required__ An array of delays between attempts. The first attempt will occur whenever you originally enqueued the job to happen.
 | `min_delay_multiplier` |         | If supplied, each delay will be multiplied by a random number between this and `max_delay_multiplier`.
 | `max_delay_multiplier` |         | The other end of the range for `min_delay_multiplier`. If one is supplied, both must be.
-| `retryable_exceptions` | `nil`   | Same as for `constant_retry`.
-| `fatal_exceptions`     | `[]`    | Same as for `constant_retry`.
+| `retryable_exceptions` | `nil`   | Same as for [constant_retry](#constant_retry-options).
+| `fatal_exceptions`     | `[]`    | Same as for [constant_retry](#constant_retry-options).
 
 Contributing
 ------------
