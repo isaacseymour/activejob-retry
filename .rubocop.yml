@@ -20,3 +20,6 @@ Style/Documentation:
 
 Style/DotPosition:
   EnforcedStyle: trailing
+
+Style/GuardClause:
+  Enabled: false
