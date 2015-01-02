@@ -41,23 +41,23 @@ end
 ```
 
 #### constant_retry options
-|  Option                | Default | Description          |
-|:---------------------- |:------- |:----------- |
-| `limit`                | `1`     | Maximum number of times to attempt the job.
+|  Option                | Default | Description    |
+|:---------------------- |:------- |:-------------- |
+| `limit`                | `1`     | Maximum number of times to attempt the job (default: 1).
 | `unlimited_retries`    | `false` | If set to `true`, this job will be repeated indefinitely until in succeeds. Use with extreme caution.
-| `delay`                | `0`     | Time between attempts.
-| `retryable_exceptions` | `nil`   | A whitelist of exceptions to retry. When `nil`, all exceptions will result in a retry).
-| `fatal_exceptions`     | `[]`    | A blacklist of exceptions to not retry,
+| `delay`                | `0`     | Time between attempts (default: 0).
+| `retryable_exceptions` | `nil`   | A whitelist of exceptions to retry. When `nil`, all exceptions will result in a retry.
+| `fatal_exceptions`     | `[]`    | A blacklist of exceptions to not retry (default: []).
 
 #### variable_retry options
 
-| Option                 | Default | Description           |
-|:---------------------- |:------- |:-------------- |
+| Option                 | Default | Description   |
+|:---------------------- |:------- |:------------- |
 | `delays`               |         | __required__ An array of delays between attempts. The first attempt will occur whenever you originally enqueued the job to happen.
 | `min_delay_multiplier` |         | If supplied, each delay will be multiplied by a random number between this and `max_delay_multiplier`.
 | `max_delay_multiplier` |         | The other end of the range for `min_delay_multiplier`. If one is supplied, both must be.
-| `retryable_exceptions` | `nil`   | Same as for `constant_retry`.
-| `fatal_exceptions`     | `[]`    | Same as for `constant_retry`.
+| `retryable_exceptions` | `nil`   | Same as for [constant_retry](#constant_retry-options).
+| `fatal_exceptions`     | `[]`    | Same as for [constant_retry](#constant_retry-options).
 
 Contributing
 ------------
