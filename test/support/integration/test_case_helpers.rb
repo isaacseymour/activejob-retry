@@ -45,4 +45,8 @@ module TestCaseHelpers
     def job_executed
       Dummy::Application.root.join("tmp/#{@id}").exist?
     end
+
+    def rescue_executed
+      Dummy::Application.root.join("tmp/#{@id}_rescue").exist?
+    end
 end

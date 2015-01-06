@@ -83,23 +83,22 @@ module ActiveJob
     # Performing the retries #
     ##########################
 
-    # Override `rescue_with_handler` to make sure our catch is the last one, and doesn't
-    # happen if the exception has already been caught in a `rescue_from`
+    # Override `rescue_with_handler` to make sure our catch is before callbacks,
+    # so only run when the job is finally failing.
     def rescue_with_handler(exception)
-      super || retry_or_reraise(exception)
+      retry_or_reraise(exception) || super(exception)
     end
 
     private
 
     def retry_or_reraise(exception)
       unless self.class.backoff_strategy.should_retry?(retry_attempt, exception)
-        raise exception
+        return false
       end
 
       this_delay = self.class.backoff_strategy.retry_delay(retry_attempt, exception)
       # TODO: This breaks DelayedJob and Resque for some weird ActiveSupport reason.
-      # logger.log(Logger::INFO,
-      #            "Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
+      # logger.info("Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
       @retry_attempt += 1
       retry_job(wait: this_delay)
 
