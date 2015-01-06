@@ -3,7 +3,7 @@ AllCops:
     - Rakefile
   Exclude:
     - .*/**/*
-    - vendor/**
+    - vendor/**/*
     - test/**/*
 
 LineLength:
