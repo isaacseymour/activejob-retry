@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    activejob-retry (0.2.0)
+    activejob-retry (0.3.0)
       activejob (>= 4.2)
       activesupport (>= 4.2)
 
