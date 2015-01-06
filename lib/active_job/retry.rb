@@ -84,16 +84,10 @@ module ActiveJob
     ##########################
 
     # Override `rescue_with_handler` to make sure our catch is before callbacks,
-    # so only run when the job is finally failing.
+    # so `rescue_from`s will only be run after any retry attempts have been exhausted.
     def rescue_with_handler(exception)
-      retry_or_reraise(exception) || super(exception)
-    end
-
-    private
-
-    def retry_or_reraise(exception)
       unless self.class.backoff_strategy.should_retry?(retry_attempt, exception)
-        return false
+        return super
       end
 
       this_delay = self.class.backoff_strategy.retry_delay(retry_attempt, exception)
