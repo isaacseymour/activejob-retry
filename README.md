@@ -40,6 +40,9 @@ class ProcessWebhook < ActiveJob::Base
 end
 ```
 
+The retry will get executed before any `rescue_from` blocks, which will only get executed
+if the exception is not going to be retried, or has failed the final retry.
+
 #### constant_retry options
 |  Option                | Default | Description    |
 |:---------------------- |:------- |:-------------- |

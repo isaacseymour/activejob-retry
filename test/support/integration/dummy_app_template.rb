@@ -17,11 +17,18 @@ class TestJob < ActiveJob::Base
   queue_as :integration_tests
   constant_retry limit: 2, delay: 3
 
-  def perform(x, fail_first = false)
+  def perform(x, fail_first = false, fail_always = false)
     raise "Failing first" if fail_first && retry_attempt == 1
+    raise "Failing always" if fail_always
 
     File.open(Rails.root.join("tmp/\#{x}"), "w+") do |f|
       f.write x
+    end
+  end
+
+  def write_to_rescue_file
+    File.open(Rails.root.join("tmp/\#{arguments.first}_rescue"), "w+") do |f|
+      f.write arguments.first
     end
   end
 end
