@@ -12,18 +12,20 @@ end
 
 module ActiveJob
   module Retry
-    SUPPORTED_ADAPTERS = [
-      'ActiveJob::QueueAdapters::BackburnerAdapter',
-      'ActiveJob::QueueAdapters::DelayedJobAdapter',
-      'ActiveJob::QueueAdapters::ResqueAdapter',
-      'ActiveJob::QueueAdapters::QueAdapter'
+    PROBLEMATIC_ADAPTERS = [
+      'ActiveJob::QueueAdapters::InlineAdapter',
+      'ActiveJob::QueueAdapters::QuAdapter',
+      'ActiveJob::QueueAdapters::QueueClassicAdapter',
+      'ActiveJob::QueueAdapters::SidekiqAdapter',
+      'ActiveJob::QueueAdapters::SneakersAdapter',
+      'ActiveJob::QueueAdapters::SuckerPunchAdapter'
     ].freeze
 
     def self.included(base)
-      unless SUPPORTED_ADAPTERS.include?(ActiveJob::Base.queue_adapter.to_s)
-        raise UnsupportedAdapterError,
-              'Only Backburner, DelayedJob, Que, and Resque support delayed ' \
-              "retries. #{ActiveJob::Base.queue_adapter} is not supported."
+      if PROBLEMATIC_ADAPTERS.include?(ActiveJob::Base.queue_adapter.name)
+        warn("#{ActiveJob::Base.queue_adapter.name} does not support delayed retries, " \
+             'so does not work with ActiveJob::Retry. You may experience strange ' \
+             'behaviour.')
       end
 
       base.extend(ClassMethods)
