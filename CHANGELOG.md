@@ -1,3 +1,11 @@
+## 0.4.2 - March 22, 2015
+
+- Remove Sidekiq from the problematic adapter blacklist (patch by [@troter](https://github.com/troter))
+
+## 0.4.1 - March 18, 2015
+
+- Remove the need for an explicit require (patch by [@isaacseymour](https://github.com/isaacseymour))
+
 ## 0.4.0 - January 16, 2015
 
 - Blacklist problematic adapters rather than whitelisting known good ones (patch by [@isaacseymour](https://github.com/isaacseymour))
