@@ -62,6 +62,49 @@ if the exception is not going to be retried, or has failed the final retry.
 | `retryable_exceptions` | `nil`   | Same as for [constant_retry](#constant_retry-options).
 | `fatal_exceptions`     | `[]`    | Same as for [constant_retry](#constant_retry-options).
 
+## Supported backends
+
+Any queue adapter which supports delayed enqueuing (i.e. the `enqueue_at`
+method) will work with ActiveJob::Retry, however some queue backends have
+automatic retry logic, which should be disabled. The cleanest way to do this is
+to use a `rescue_from` in the jobs for which you're using ActiveJob::Retry, so
+the queue backend never perceives the job as having failed. E.g.:
+
+```ruby
+class MyJob < ActiveJob::Base
+  include ActiveJob::Retry
+
+  queue_as :some_job
+
+  constant_retry limit: 3, delay: 5, retryable_exceptions: [TimeoutError, NetworkError]
+
+  rescue_from(StandardError) { |error| MyErrorService.record(error) }
+
+  def perform
+    raise "Weird!"
+  end
+end
+```
+
+Since `rescue_from`s are only executed once all retries have been attempted,
+this will send the recurring error to your error service (e.g. Airbrake,
+Sentry), but will make it appear to the queue backend (e.g. Que, Sidekiq) as if
+the job has succeeded.
+
+An alternative is to alter the appropriate `JobWrapper` to alter the
+configuration of the backend to disable retries globally. For Sidekiq this
+would be:
+
+```ruby
+# config/initializers/disable_sidekiq_retries.rb
+ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper.sidekiq_options(retry: false)
+```
+
+This has the advantages of moving failed jobs to the Dead Job Queue instead of
+just executing the logic in the `rescue_from`, which makes manual re-enqueueing
+easier. On the other hand it does disable Sidekiq's automatic retrying for all
+ActiveJob jobs.
+
 Contributing
 ------------
 
