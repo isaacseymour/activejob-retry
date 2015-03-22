@@ -17,7 +17,15 @@ class TestJob < ActiveJob::Base
   queue_as :integration_tests
   constant_retry limit: 2, delay: 3
 
-  def perform(x, fail_first = false, fail_always = false)
+  rescue_from(RuntimeError) do |e|
+    if arguments[3]
+      write_to_rescue_file
+    else
+      raise e
+    end
+  end
+
+  def perform(x, fail_first = false, fail_always = false, rescue_file = false)
     raise "Failing first" if fail_first && retry_attempt == 1
     raise "Failing always" if fail_always
 

@@ -45,8 +45,7 @@ class QueuingTest < ActiveSupport::TestCase
   end
 
   test 'should call rescue_from only when retries have run out' do
-    TestJob.rescue_from(RuntimeError) { write_to_rescue_file }
-    TestJob.perform_later(@id, false, true)
+    TestJob.perform_later(@id, false, true, true)
 
     wait_for_jobs_to_finish_for(2.seconds)
     assert_not job_executed
