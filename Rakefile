@@ -1,7 +1,7 @@
 require 'rake/testtask'
 require 'rubygems/package_task'
 
-ACTIVEJOB_ADAPTERS = %w(backburner delayed_job que resque)
+ACTIVEJOB_ADAPTERS = %w(backburner delayed_job que resque sidekiq)
 
 task default: :test
 task test: 'test:default'

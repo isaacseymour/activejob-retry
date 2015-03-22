@@ -16,7 +16,6 @@ module ActiveJob
       'ActiveJob::QueueAdapters::InlineAdapter',
       'ActiveJob::QueueAdapters::QuAdapter',
       'ActiveJob::QueueAdapters::QueueClassicAdapter',
-      'ActiveJob::QueueAdapters::SidekiqAdapter',
       'ActiveJob::QueueAdapters::SneakersAdapter',
       'ActiveJob::QueueAdapters::SuckerPunchAdapter'
     ].freeze
