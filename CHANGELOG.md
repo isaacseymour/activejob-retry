@@ -1,3 +1,7 @@
+## 0.5.0 - July 23, 2015
+
+- Add exponential backoff strategy (by [@DavydenkovM](https://github.com/DavydenkovM))
+
 ## 0.4.2 - March 22, 2015
 
 - Remove Sidekiq from the problematic adapter blacklist (patch by [@troter](https://github.com/troter))
