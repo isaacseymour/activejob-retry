@@ -137,9 +137,7 @@ RSpec.describe ActiveJob::Retry::ExponentialBackoffStrategy do
       let(:options) { { limit: nil, unlimited_retries: true } }
       let(:attempt) { 1000 }
 
-      it 'not rises an error if returned delay too big' do
-        expect { subject }.not_to raise_error
-      end
+      specify { expect { subject }.to_not raise_error }
     end
   end
 end

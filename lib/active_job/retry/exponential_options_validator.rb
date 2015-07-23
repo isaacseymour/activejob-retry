@@ -54,7 +54,8 @@ module ActiveJob
       def validate_delay_not_specified!
         return unless options[:delay]
 
-        raise InvalidConfigurationError, 'You can`t set delay for ExponentialBackoffStrategy'
+        raise InvalidConfigurationError,
+              'You can`t set delay for ExponentialBackoffStrategy'
       end
 
       def validate_not_both_exceptions!
