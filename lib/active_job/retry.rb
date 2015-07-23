@@ -5,6 +5,7 @@ require 'active_job/retry/version'
 require 'active_job/retry/errors'
 require 'active_job/retry/constant_backoff_strategy'
 require 'active_job/retry/variable_backoff_strategy'
+require 'active_job/retry/exponential_backoff_strategy'
 
 unless ActiveJob::Base.method_defined?(:deserialize)
   require 'active_job/retry/deserialize_monkey_patch'
@@ -43,6 +44,10 @@ module ActiveJob
 
       def variable_retry(options)
         retry_with(VariableBackoffStrategy.new(options))
+      end
+
+      def exponential_retry(options)
+        retry_with(ExponentialBackoffStrategy.new(options))
       end
 
       def retry_with(backoff_strategy)

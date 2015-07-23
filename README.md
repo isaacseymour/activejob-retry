@@ -4,7 +4,7 @@ ActiveJob::Retry [![Build Status](https://travis-ci.org/gocardless/activejob-ret
 **This is an alpha library** in active development, so the API may change.
 
 Automatic retry functionality for ActiveJob. Just `include ActiveJob::Retry` in your job
-class and call one of `constant_retry`, `variable_retry`, or `retry_with` to define your
+class and call one of `constant_retry`, `variable_retry`, `exponential_retry` or `retry_with` to define your
 retry strategy:
 
 ```ruby
@@ -18,6 +18,9 @@ class ProcessWebhook < ActiveJob::Base
 
   # Or, variable delay between attempts:
   variable_retry delays: [1.minute, 5.minutes, 10.minutes, 30.minutes]
+
+  # Or, exponential delay between attempts:
+  exponential_retry limit: 25
 
   # You can also use a custom backoff strategy by passing an object which responds to
   # `should_retry?(attempt, exception)`, and `retry_delay(attempt, exception)`
@@ -51,6 +54,14 @@ if the exception is not going to be retried, or has failed the final retry.
 | `delay`                | `0`     | Time between attempts in seconds (default: 0).
 | `retryable_exceptions` | `nil`   | A whitelist of exceptions to retry. When `nil`, all exceptions will result in a retry.
 | `fatal_exceptions`     | `[]`    | A blacklist of exceptions to not retry (default: []).
+
+#### exponential_retry options
+|  Option                | Default | Description    |
+|:---------------------- |:------- |:-------------- |
+| `limit`                | `1`     | Maximum number of times to attempt the job (default: 1).
+| `unlimited_retries`    | `false` | If set to `true`, this job will be repeated indefinitely until in succeeds. Use with extreme caution.
+| `retryable_exceptions` | `nil`   | Same as for [constant_retry](#constant_retry-options).
+| `fatal_exceptions`     | `[]`    | Same as for [constant_retry](#constant_retry-options).
 
 #### variable_retry options
 

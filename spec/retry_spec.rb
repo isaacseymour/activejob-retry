@@ -43,6 +43,28 @@ RSpec.describe ActiveJob::Retry do
     end
   end
 
+  describe '.exponential_retry' do
+    it 'sets an ExponentialBackoffStrategy' do
+      job.exponential_retry(limit: 10)
+      expect(job.backoff_strategy).to be_a(ActiveJob::Retry::ExponentialBackoffStrategy)
+    end
+
+    context 'invalid options' do
+      let(:options) { { limit: -2 } }
+      let(:options_with_delay) { { limit: 2, delay: 3 } }
+
+      specify do
+        expect { job.exponential_retry(options) }.
+          to raise_error(ActiveJob::Retry::InvalidConfigurationError)
+      end
+
+      specify do
+        expect { job.exponential_retry(options_with_delay) }.
+          to raise_error(ActiveJob::Retry::InvalidConfigurationError)
+      end
+    end
+  end
+
   describe '.retry_with' do
     it 'rejects invalid backoff strategies' do
       expect { job.retry_with(Object.new) }.
