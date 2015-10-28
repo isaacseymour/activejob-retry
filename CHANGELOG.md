@@ -1,3 +1,7 @@
+## 0.5.1 - October 28, 2015
+
+- Stop warning about QueueClassic - it supports delayed execution from 3.1+ (by [@senny](https://github.com/senny))
+
 ## 0.5.0 - July 23, 2015
 
 - Add exponential backoff strategy (by [@DavydenkovM](https://github.com/DavydenkovM))
