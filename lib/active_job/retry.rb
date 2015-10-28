@@ -16,7 +16,6 @@ module ActiveJob
     PROBLEMATIC_ADAPTERS = [
       'ActiveJob::QueueAdapters::InlineAdapter',
       'ActiveJob::QueueAdapters::QuAdapter',
-      'ActiveJob::QueueAdapters::QueueClassicAdapter',
       'ActiveJob::QueueAdapters::SneakersAdapter',
       'ActiveJob::QueueAdapters::SuckerPunchAdapter'
     ].freeze
