@@ -1,7 +1,7 @@
 require 'active_job/retry/errors'
 
 module ActiveJob
-  module Retry
+  class Retry < Module
     class ExponentialOptionsValidator
       def initialize(options)
         @options = options

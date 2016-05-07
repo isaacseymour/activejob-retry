@@ -1,5 +1,5 @@
 class NestedJob < ActiveJob::Base
-  include ActiveJob::Retry
+  include ActiveJob::Retry.new(strategy: :constant)
 
   def perform
     LoggingJob.perform_later "NestedJob"

@@ -1,19 +1,22 @@
 require 'spec_helper'
 
 RSpec.describe ActiveJob::Retry do
-  subject(:job) do
+  let(:strategy) { :constant }
+  let(:options) { {} }
+  let(:retry_instance) { described_class.new(strategy: strategy, **options) }
+  let(:job) do
     Class.new(ActiveJob::Base) do
-      include ActiveJob::Retry
-
       def perform(*_args)
         raise RuntimeError
       end
-    end
+    end.include(retry_instance)
   end
 
   describe '.constant_retry' do
+    let(:strategy) { :constant }
+    let(:options) { { limit: 10, delay: 5 } }
+
     it 'sets a ConstantBackoffStrategy' do
-      job.constant_retry(limit: 10, delay: 5)
       expect(job.backoff_strategy).to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
     end
 
@@ -21,15 +24,17 @@ RSpec.describe ActiveJob::Retry do
       let(:options) { { limit: -2 } }
 
       specify do
-        expect { job.constant_retry(options) }.
+        expect { retry_instance }.
           to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
     end
   end
 
   describe '.variable_retry' do
+    let(:strategy) { :variable }
+    let(:options) { { delays: [0, 5, 10, 60, 200] } }
+
     it 'sets a VariableBackoffStrategy' do
-      job.variable_retry(delays: [0, 5, 10, 60, 200])
       expect(job.backoff_strategy).to be_a(ActiveJob::Retry::VariableBackoffStrategy)
     end
 
@@ -37,52 +42,58 @@ RSpec.describe ActiveJob::Retry do
       let(:options) { {} }
 
       specify do
-        expect { job.variable_retry(options) }.
+        expect { retry_instance }.
           to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
     end
   end
 
   describe '.exponential_retry' do
+    let(:strategy) { :exponential }
+    let(:options) { { limit: 10 } }
+
     it 'sets an ExponentialBackoffStrategy' do
-      job.exponential_retry(limit: 10)
       expect(job.backoff_strategy).to be_a(ActiveJob::Retry::ExponentialBackoffStrategy)
     end
 
-    context 'invalid options' do
+    context 'invalid limit' do
       let(:options) { { limit: -2 } }
-      let(:options_with_delay) { { limit: 2, delay: 3 } }
 
       specify do
-        expect { job.exponential_retry(options) }.
+        expect { retry_instance }.
           to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
+    end
+
+    context 'invalid option included' do
+      let(:options) { { limit: 2, delay: 3 } }
 
       specify do
-        expect { job.exponential_retry(options_with_delay) }.
+        expect { retry_instance }.
           to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
     end
   end
 
-  describe '.retry_with' do
+  describe 'custom strategy' do
+    module CustomBackoffStrategy
+      def self.should_retry?(_attempt, _exception)
+        true
+      end
+
+      def self.retry_delay(_attempt, _exception)
+        5
+      end
+    end
+
     it 'rejects invalid backoff strategies' do
-      expect { job.retry_with(Object.new) }.
+      expect { described_class.new(strategy: Object.new) }.
         to raise_error(ActiveJob::Retry::InvalidConfigurationError)
     end
 
+    let(:strategy) { CustomBackoffStrategy }
+
     it 'sets the backoff_strategy when it is valid' do
-      module CustomBackoffStrategy
-        def self.should_retry?(_attempt, _exception)
-          true
-        end
-
-        def self.retry_delay(_attempt, _exception)
-          5
-        end
-      end
-
-      job.retry_with(CustomBackoffStrategy)
       expect(job.backoff_strategy).to eq(CustomBackoffStrategy)
     end
   end
@@ -143,17 +154,16 @@ RSpec.describe ActiveJob::Retry do
   end
 
   describe '#rescue_with_handler' do
-    let(:backoff_strategy) { described_class::ConstantBackoffStrategy.new(limit: 100) }
+    let(:mod) { described_class.new(strategy: :constant, limit: 100) }
     let(:instance) { job.new }
-    before { job.retry_with(backoff_strategy) }
     subject(:perform) { instance.perform_now }
 
     context 'when the job should be retried' do
       before do
-        expect(backoff_strategy).to receive(:should_retry?).
+        expect(job.backoff_strategy).to receive(:should_retry?).
           with(1, instance_of(RuntimeError)).
           and_return(true)
-        expect(backoff_strategy).to receive(:retry_delay).
+        expect(job.backoff_strategy).to receive(:retry_delay).
           with(1, instance_of(RuntimeError)).
           and_return(5)
       end
@@ -179,7 +189,7 @@ RSpec.describe ActiveJob::Retry do
 
     context 'when the job should not be retried' do
       before do
-        expect(backoff_strategy).to receive(:should_retry?).
+        expect(job.backoff_strategy).to receive(:should_retry?).
           with(1, instance_of(RuntimeError)).
           and_return(false)
       end

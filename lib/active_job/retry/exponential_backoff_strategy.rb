@@ -1,7 +1,7 @@
 require 'active_job/retry/exponential_options_validator'
 
 module ActiveJob
-  module Retry
+  class Retry < Module
     class ExponentialBackoffStrategy < ConstantBackoffStrategy
       def initialize(options)
         ExponentialOptionsValidator.new(options).validate!

@@ -1,5 +1,5 @@
 module ActiveJob
-  module Retry
+  class Retry < Module
     VERSION = '0.5.1'
   end
 end

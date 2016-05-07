@@ -1,5 +1,5 @@
 class LoggingJob < ActiveJob::Base
-  include ActiveJob::Retry
+  include ActiveJob::Retry.new(strategy: :constant)
 
   def perform(dummy)
     logger.info "Dummy, here is it: #{dummy}"

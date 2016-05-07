@@ -1,7 +1,7 @@
 require 'active_job/retry'
 require 'rspec/its'
 
-ActiveJob::Base.queue_adapter = :resque
+ActiveJob::Base.queue_adapter = :test
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

@@ -12,7 +12,7 @@ CODE
 
 file 'app/jobs/test_job.rb', <<-CODE
 class TestJob < ActiveJob::Base
-  include ActiveJob::Retry
+  include ActiveJob::Retry.new(strategy: :constant)
 
   queue_as :integration_tests
   constant_retry limit: 2, delay: 3

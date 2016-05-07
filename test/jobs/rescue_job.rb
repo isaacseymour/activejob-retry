@@ -1,8 +1,7 @@
 require_relative '../support/job_buffer'
 
 class RescueJob < ActiveJob::Base
-  include ActiveJob::Retry
-  constant_retry limit: 0, delay: 0
+  include ActiveJob::Retry.new(strategy: :constant, limit: 0, delay: 0)
 
   class OtherError < StandardError; end
 

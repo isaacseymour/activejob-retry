@@ -1,7 +1,7 @@
 require 'active_job/retry/errors'
 
 module ActiveJob
-  module Retry
+  class Retry < Module
     class VariableOptionsValidator
       DELAY_MULTIPLIER_KEYS = [:min_delay_multiplier, :max_delay_multiplier].freeze
 

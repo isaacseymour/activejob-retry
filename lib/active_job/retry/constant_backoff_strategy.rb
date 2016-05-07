@@ -1,7 +1,7 @@
 require 'active_job/retry/constant_options_validator'
 
 module ActiveJob
-  module Retry
+  class Retry < Module
     class ConstantBackoffStrategy
       def initialize(options)
         ConstantOptionsValidator.new(options).validate!

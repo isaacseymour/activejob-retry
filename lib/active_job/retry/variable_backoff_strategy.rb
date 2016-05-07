@@ -2,7 +2,7 @@ require 'active_job/retry/constant_backoff_strategy'
 require 'active_job/retry/variable_options_validator'
 
 module ActiveJob
-  module Retry
+  class Retry < Module
     class VariableBackoffStrategy < ConstantBackoffStrategy
       def initialize(options)
         super(options)

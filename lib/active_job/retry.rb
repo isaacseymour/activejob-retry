@@ -11,8 +11,17 @@ unless ActiveJob::Base.method_defined?(:deserialize)
   require 'active_job/retry/deserialize_monkey_patch'
 end
 
+def choose_strategy(strategy, options)
+  case strategy
+  when :constant    then ActiveJob::Retry::ConstantBackoffStrategy.new(options)
+  when :variable    then ActiveJob::Retry::VariableBackoffStrategy.new(options)
+  when :exponential then ActiveJob::Retry::ExponentialBackoffStrategy.new(options)
+  else strategy
+  end
+end
+
 module ActiveJob
-  module Retry
+  class Retry < Module
     PROBLEMATIC_ADAPTERS = [
       'ActiveJob::QueueAdapters::InlineAdapter',
       'ActiveJob::QueueAdapters::QuAdapter',
@@ -20,88 +29,89 @@ module ActiveJob
       'ActiveJob::QueueAdapters::SuckerPunchAdapter'
     ].freeze
 
-    def self.included(base)
+    #################
+    # Configuration #
+    #################
+    def initialize(strategy: nil, **options)
+      check_adapter!
+      @backoff_strategy = choose_strategy(strategy, options)
+
+      unless backoff_strategy_valid?
+        raise InvalidConfigurationError,
+              'Backoff strategies must define `should_retry?(attempt, exception)`, ' \
+              'and `retry_delay(attempt, exception)`.'
+      end
+    end
+
+    def included(base)
+      define_backoff_strategy(base)
+      define_retry_attempt_tracking(base)
+      define_retry_method(base)
+      define_retry_logic(base)
+    end
+
+    private
+
+    attr_reader :backoff_strategy
+
+    def define_backoff_strategy(klass)
+      klass.instance_variable_set(:@backoff_strategy, @backoff_strategy)
+      klass.define_singleton_method(:backoff_strategy) { @backoff_strategy }
+    end
+
+    def define_retry_attempt_tracking(klass)
+      klass.instance_eval do
+        define_method(:serialize) do |*args|
+          super(*args).merge('retry_attempt' => retry_attempt)
+        end
+        define_method :deserialize do |job_data|
+          super(job_data)
+          @retry_attempt = job_data['retry_attempt']
+        end
+        define_method(:retry_attempt) { @retry_attempt ||= 1 }
+      end
+    end
+
+    def define_retry_method(klass)
+      klass.instance_eval do
+        define_method :internal_retry do |exception|
+          this_delay = self.class.backoff_strategy.retry_delay(retry_attempt, exception)
+          # TODO: This breaks DelayedJob and Resque for some weird ActiveSupport reason.
+          # logger.info("Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
+          @retry_attempt += 1
+          retry_job(wait: this_delay)
+        end
+      end
+    end
+
+    def define_retry_logic(klass)
+      klass.instance_eval do
+        # Override `rescue_with_handler` to make sure our catch is before callbacks,
+        # so `rescue_from`s will only be run after any retry attempts have been exhausted.
+        define_method :rescue_with_handler do |exception|
+          if self.class.backoff_strategy.should_retry?(retry_attempt, exception)
+            internal_retry(exception)
+            return true # Exception has been handled
+          else
+            return super(exception)
+          end
+        end
+      end
+    end
+
+    def check_adapter!
       if PROBLEMATIC_ADAPTERS.include?(ActiveJob::Base.queue_adapter.name)
         warn("#{ActiveJob::Base.queue_adapter.name} does not support delayed retries, " \
              'so does not work with ActiveJob::Retry. You may experience strange ' \
              'behaviour.')
       end
-
-      base.extend(ClassMethods)
     end
 
-    #################
-    # Configuration #
-    #################
-
-    module ClassMethods
-      attr_reader :backoff_strategy
-
-      def constant_retry(options)
-        retry_with(ConstantBackoffStrategy.new(options))
-      end
-
-      def variable_retry(options)
-        retry_with(VariableBackoffStrategy.new(options))
-      end
-
-      def exponential_retry(options)
-        retry_with(ExponentialBackoffStrategy.new(options))
-      end
-
-      def retry_with(backoff_strategy)
-        unless backoff_strategy_valid?(backoff_strategy)
-          raise InvalidConfigurationError,
-                'Backoff strategies must define `should_retry?(attempt, exception)`, ' \
-                'and `retry_delay(attempt, exception)`.'
-        end
-
-        @backoff_strategy = backoff_strategy
-      end
-
-      def backoff_strategy_valid?(backoff_strategy)
-        backoff_strategy.respond_to?(:should_retry?) &&
-          backoff_strategy.respond_to?(:retry_delay) &&
-          backoff_strategy.method(:should_retry?).arity == 2 &&
-          backoff_strategy.method(:retry_delay).arity == 2
-      end
-    end
-
-    #############################
-    # Storage of attempt number #
-    #############################
-
-    def serialize
-      super.merge('retry_attempt' => retry_attempt)
-    end
-
-    def deserialize(job_data)
-      super(job_data)
-      @retry_attempt = job_data['retry_attempt']
-    end
-
-    def retry_attempt
-      @retry_attempt ||= 1
-    end
-
-    ##########################
-    # Performing the retries #
-    ##########################
-
-    # Override `rescue_with_handler` to make sure our catch is before callbacks,
-    # so `rescue_from`s will only be run after any retry attempts have been exhausted.
-    def rescue_with_handler(exception)
-      unless self.class.backoff_strategy.should_retry?(retry_attempt, exception)
-        return super
-      end
-
-      this_delay = self.class.backoff_strategy.retry_delay(retry_attempt, exception)
-      # TODO: This breaks DelayedJob and Resque for some weird ActiveSupport reason.
-      # logger.info("Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
-      @retry_attempt += 1
-      retry_job(wait: this_delay)
-
-      true # Exception has been handled
+    def backoff_strategy_valid?
+      backoff_strategy.respond_to?(:should_retry?) &&
+        backoff_strategy.respond_to?(:retry_delay) &&
+        backoff_strategy.method(:should_retry?).arity == 2 &&
+        backoff_strategy.method(:retry_delay).arity == 2
     end
   end
 end

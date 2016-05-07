@@ -1,5 +1,5 @@
 class CallbackJob < ActiveJob::Base
-  include ActiveJob::Retry
+  include ActiveJob::Retry.new(strategy: :constant)
 
   before_perform ->(job) { job.history << "CallbackJob ran before_perform" }
   after_perform ->(job) { job.history << "CallbackJob ran after_perform" }

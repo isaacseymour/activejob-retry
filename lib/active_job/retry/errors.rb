@@ -1,5 +1,5 @@
 module ActiveJob
-  module Retry
+  class Retry < Module
     class InvalidConfigurationError < StandardError; end
     class UnsupportedAdapterError < StandardError; end
   end
