@@ -12,10 +12,9 @@ CODE
 
 file 'app/jobs/test_job.rb', <<-CODE
 class TestJob < ActiveJob::Base
-  include ActiveJob::Retry.new(strategy: :constant)
+  include ActiveJob::Retry.new(strategy: :constant, limit: 2, delay: 3)
 
   queue_as :integration_tests
-  constant_retry limit: 2, delay: 3
 
   rescue_from(RuntimeError) do |e|
     if arguments[3]
