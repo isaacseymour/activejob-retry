@@ -1,4 +1,4 @@
-ActiveJob::Retry [![Build Status](https://travis-ci.org/gocardless/activejob-retry.svg?branch=master)](https://travis-ci.org/gocardless/activejob-retry)
+ActiveJob::Retry [![Build Status](https://travis-ci.org/isaacseymour/activejob-retry.svg?branch=master)](https://travis-ci.org/isaacseymour/activejob-retry)
 ================
 
 **This is an alpha library** in active development, so the API may change.

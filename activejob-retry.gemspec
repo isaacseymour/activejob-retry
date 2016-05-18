@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
     * Exponential backoff (varying the delay between retries).
     * Light and easy to override retry logic.
   EOL
-  s.homepage = 'http://github.com/gocardless/activejob-retry'
+  s.homepage = 'https://github.com/isaacseymour/activejob-retry'
   s.license = 'MIT'
 
   s.has_rdoc = false

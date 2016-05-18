@@ -1,3 +1,7 @@
+## 0.6.0 - May 18, 2016
+
+- Change API usage to make improper use harder (by [@isaacseymour](https://github.com/isaacseymour))
+
 ## 0.5.1 - October 28, 2015
 
 - Stop warning about QueueClassic - it supports delayed execution from 3.1+ (by [@senny](https://github.com/senny))
