@@ -1,7 +1,7 @@
 require 'rake/testtask'
 require 'rubygems/package_task'
 
-ACTIVEJOB_ADAPTERS = %w(backburner delayed_job que resque sidekiq)
+ACTIVEJOB_ADAPTERS = %w(backburner delayed_job que resque sidekiq).freeze
 
 task default: :test
 task test: 'test:default'
@@ -49,14 +49,15 @@ namespace :test do
 
     namespace :integration do
       Rake::TestTask.new(
-        adapter => ["test:env:#{adapter}", 'test:env:integration']) do |t|
-          t.description = "Run integration tests for #{adapter}"
-          t.libs << 'test'
-          t.test_files = FileList['test/integration/**/*_test.rb']
-          t.verbose = true
-          t.warning = true
-          t.ruby_opts = ['--dev'] if defined?(JRUBY_VERSION)
-        end
+        adapter => ["test:env:#{adapter}", 'test:env:integration']
+      ) do |t|
+        t.description = "Run integration tests for #{adapter}"
+        t.libs << 'test'
+        t.test_files = FileList['test/integration/**/*_test.rb']
+        t.verbose = true
+        t.warning = true
+        t.ruby_opts = ['--dev'] if defined?(JRUBY_VERSION)
+      end
     end
   end
 end
