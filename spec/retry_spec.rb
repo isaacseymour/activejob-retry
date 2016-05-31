@@ -32,7 +32,8 @@ RSpec.describe ActiveJob::Retry do
     context 'subclassing' do
       let(:subclass) { Class.new(job) }
       it 'has the ConstantBackoffStrategy' do
-        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
+        expect(subclass.backoff_strategy).
+          to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
       end
     end
   end
@@ -57,12 +58,14 @@ RSpec.describe ActiveJob::Retry do
     context 'subclassing' do
       let(:subclass) { Class.new(job) }
       it 'has the VariableBackoffStrategy' do
-        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::VariableBackoffStrategy)
+        expect(subclass.backoff_strategy).
+          to be_a(ActiveJob::Retry::VariableBackoffStrategy)
       end
 
       it 'allows overriding' do
         subclass.include(described_class.new(strategy: :constant))
-        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
+        expect(subclass.backoff_strategy).
+          to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
       end
     end
   end
@@ -96,7 +99,8 @@ RSpec.describe ActiveJob::Retry do
     context 'subclassing' do
       let(:subclass) { Class.new(job) }
       it 'has the ExponentialBackoffStrategy' do
-        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::ExponentialBackoffStrategy)
+        expect(subclass.backoff_strategy).
+          to be_a(ActiveJob::Retry::ExponentialBackoffStrategy)
       end
     end
   end
