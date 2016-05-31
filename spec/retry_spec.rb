@@ -59,6 +59,11 @@ RSpec.describe ActiveJob::Retry do
       it 'has the VariableBackoffStrategy' do
         expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::VariableBackoffStrategy)
       end
+
+      it 'allows overriding' do
+        subclass.include(described_class.new(strategy: :constant))
+        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
+      end
     end
   end
 
