@@ -12,7 +12,7 @@ RSpec.describe ActiveJob::Retry do
     end.include(retry_instance)
   end
 
-  describe '.constant_retry' do
+  describe 'constant strategy' do
     let(:strategy) { :constant }
     let(:options) { { limit: 10, delay: 5 } }
 
@@ -28,9 +28,16 @@ RSpec.describe ActiveJob::Retry do
           to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
     end
+
+    context 'subclassing' do
+      let(:subclass) { Class.new(job) }
+      it 'has the ConstantBackoffStrategy' do
+        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
+      end
+    end
   end
 
-  describe '.variable_retry' do
+  describe 'variable strategy' do
     let(:strategy) { :variable }
     let(:options) { { delays: [0, 5, 10, 60, 200] } }
 
@@ -46,9 +53,16 @@ RSpec.describe ActiveJob::Retry do
           to raise_error(ActiveJob::Retry::InvalidConfigurationError)
       end
     end
+
+    context 'subclassing' do
+      let(:subclass) { Class.new(job) }
+      it 'has the VariableBackoffStrategy' do
+        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::VariableBackoffStrategy)
+      end
+    end
   end
 
-  describe '.exponential_retry' do
+  describe 'exponential strategy' do
     let(:strategy) { :exponential }
     let(:options) { { limit: 10 } }
 
@@ -71,6 +85,13 @@ RSpec.describe ActiveJob::Retry do
       specify do
         expect { retry_instance }.
           to raise_error(ActiveJob::Retry::InvalidConfigurationError)
+      end
+    end
+
+    context 'subclassing' do
+      let(:subclass) { Class.new(job) }
+      it 'has the ExponentialBackoffStrategy' do
+        expect(subclass.backoff_strategy).to be_a(ActiveJob::Retry::ExponentialBackoffStrategy)
       end
     end
   end
@@ -96,6 +117,13 @@ RSpec.describe ActiveJob::Retry do
     it 'sets the backoff_strategy when it is valid' do
       expect(job.backoff_strategy).to eq(CustomBackoffStrategy)
     end
+
+    context 'subclassing' do
+      let(:subclass) { Class.new(job) }
+      it 'has the CustomBackoffStrategy' do
+        expect(subclass.backoff_strategy).to eq(strategy)
+      end
+    end
   end
 
   describe '#serialize' do
@@ -114,6 +142,26 @@ RSpec.describe ActiveJob::Retry do
     context '7th attempt' do
       before { instance.instance_variable_set(:@retry_attempt, 7) }
       it { is_expected.to include('retry_attempt' => 7) }
+    end
+
+    context 'when inherited' do
+      let(:subclass) { Class.new(job) }
+      let(:instance) { subclass.new }
+      subject { instance.serialize }
+
+      context 'first instantiated' do
+        it { is_expected.to include('retry_attempt' => 1) }
+      end
+
+      context '1st attempt' do
+        before { instance.instance_variable_set(:@retry_attempt, 1) }
+        it { is_expected.to include('retry_attempt' => 1) }
+      end
+
+      context '7th attempt' do
+        before { instance.instance_variable_set(:@retry_attempt, 7) }
+        it { is_expected.to include('retry_attempt' => 7) }
+      end
     end
   end
 
@@ -150,6 +198,43 @@ RSpec.describe ActiveJob::Retry do
       its(:job_id) { is_expected.to eq('uuid') }
       its(:arguments) { is_expected.to eq(['arg1', { 'arg' => 2 }]) }
       its(:retry_attempt) { is_expected.to eq(7) }
+    end
+
+    context 'when subclassing' do
+      let(:subclass) { Class.new(job) }
+      subject(:instance) { subclass.new }
+      before { instance.deserialize(job_data) }
+      before { instance.send(:deserialize_arguments_if_needed) }
+
+      context '1st attempt' do
+        let(:job_data) do
+          {
+            'job_class'     => 'SomeJob',
+            'job_id'        => 'uuid',
+            'arguments'     => ['arg1', { 'arg' => 2 }],
+            'retry_attempt' => 1
+          }
+        end
+
+        its(:job_id) { is_expected.to eq('uuid') }
+        its(:arguments) { is_expected.to eq(['arg1', { 'arg' => 2 }]) }
+        its(:retry_attempt) { is_expected.to eq(1) }
+      end
+
+      context '7th attempt' do
+        let(:job_data) do
+          {
+            'job_class'     => 'SomeJob',
+            'job_id'        => 'uuid',
+            'arguments'     => ['arg1', { 'arg' => 2 }],
+            'retry_attempt' => 7
+          }
+        end
+
+        its(:job_id) { is_expected.to eq('uuid') }
+        its(:arguments) { is_expected.to eq(['arg1', { 'arg' => 2 }]) }
+        its(:retry_attempt) { is_expected.to eq(7) }
+      end
     end
   end
 
