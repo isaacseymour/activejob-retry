@@ -44,6 +44,8 @@ module ActiveJob
     end
 
     def included(base)
+      klass = self
+      base.define_singleton_method(:inherited) { |subclass| subclass.include(klass) }
       define_backoff_strategy(base)
       define_retry_attempt_tracking(base)
       define_retry_method(base)
