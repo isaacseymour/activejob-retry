@@ -9,7 +9,7 @@ RSpec.describe ActiveJob::Retry do
       def perform(*_args)
         raise RuntimeError
       end
-    end.include(retry_instance)
+    end.send(:include, retry_instance)
   end
 
   describe 'constant strategy' do
@@ -63,7 +63,7 @@ RSpec.describe ActiveJob::Retry do
       end
 
       it 'allows overriding' do
-        subclass.include(described_class.new(strategy: :constant))
+        subclass.send(:include, described_class.new(strategy: :constant))
         expect(subclass.backoff_strategy).
           to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
       end

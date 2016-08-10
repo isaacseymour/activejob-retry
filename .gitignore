@@ -3,3 +3,5 @@
 .rbx/
 *.gem
 .ruby-version
+Gemfile.lock
+Gemfile.*.lock
