@@ -118,6 +118,13 @@ just executing the logic in the `rescue_from`, which makes manual re-enqueueing
 easier. On the other hand it does disable Sidekiq's automatic retrying for all
 ActiveJob jobs.
 
+Supported Versions
+------------------
+
+Rails 4.2 and 5.0 are supported, on all versions of MRI which they support, except
+Ruby 1.9.3. Other Ruby runtimes (e.g. JRuby, Rubinius) probably work, but are not
+tested in Travis CI.
+
 Contributing
 ------------
 

@@ -45,7 +45,9 @@ module ActiveJob
 
     def included(base)
       klass = self
-      base.define_singleton_method(:inherited) { |subclass| subclass.include(klass) }
+      base.define_singleton_method(:inherited) do |subclass|
+        subclass.send(:include, klass)
+      end
       define_backoff_strategy(base)
       define_retry_attempt_tracking(base)
       define_retry_method(base)
@@ -102,10 +104,16 @@ module ActiveJob
     end
 
     def check_adapter!
-      if PROBLEMATIC_ADAPTERS.include?(ActiveJob::Base.queue_adapter.name)
-        warn("#{ActiveJob::Base.queue_adapter.name} does not support delayed retries, " \
-             'so does not work with ActiveJob::Retry. You may experience strange ' \
-             'behaviour.')
+      adapter = ActiveJob::Base.queue_adapter
+      adapter_name =
+        case adapter
+        when Class then adapter.name
+        else adapter.class.name
+        end
+
+      if PROBLEMATIC_ADAPTERS.include?(adapter_name)
+        warn("#{adapter_name} does not support delayed retries, so does not work with " \
+             'ActiveJob::Retry. You may experience strange behaviour.')
       end
     end
 
