@@ -295,4 +295,56 @@ RSpec.describe ActiveJob::Retry do
       end
     end
   end
+
+  describe 'retry callback' do
+    let(:retry_instance) do
+      described_class.new(strategy: :constant, callback: callback, **options)
+    end
+    let(:callback_double) { double(call: nil) }
+    let(:callback) { callback_double.method(:call).to_proc }
+    let(:instance) { job.new }
+    subject(:perform) { instance.perform_now }
+
+    context 'invalid options' do
+      let(:callback) { 'not a proc' }
+
+      specify do
+        expect { retry_instance }.
+          to raise_error(ActiveJob::Retry::InvalidConfigurationError)
+      end
+    end
+
+    context 'when the job should be retried' do
+      before do
+        expect(job.backoff_strategy).to receive(:should_retry?).
+          with(1, instance_of(RuntimeError)).
+          and_return(true)
+      end
+
+      it 'executes callback proc on retry' do
+        expect(callback_double).to receive(:call)
+        perform
+      end
+
+      context 'with callback returning :halt' do
+        let(:callback) { proc { :halt } }
+
+        it 'it does not retry the job' do
+          expect(instance).not_to receive(:retry_job)
+
+          perform
+        end
+      end
+
+      context 'with callback not returning :halt' do
+        let(:callback) { proc { 'not halt' } }
+
+        it 'it retries the job' do
+          expect(instance).to receive(:retry_job)
+
+          perform
+        end
+      end
+    end
+  end
 end

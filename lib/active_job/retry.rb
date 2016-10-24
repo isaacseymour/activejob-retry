@@ -32,15 +32,12 @@ module ActiveJob
     #################
     # Configuration #
     #################
-    def initialize(strategy: nil, **options)
+    def initialize(strategy: nil, callback: nil, **options)
       check_adapter!
       @backoff_strategy = choose_strategy(strategy, options)
+      @retry_callback = callback
 
-      unless backoff_strategy_valid?
-        raise InvalidConfigurationError,
-              'Backoff strategies must define `should_retry?(attempt, exception)`, ' \
-              'and `retry_delay(attempt, exception)`.'
-      end
+      validate_params
     end
 
     def included(base)
@@ -52,11 +49,12 @@ module ActiveJob
       define_retry_attempt_tracking(base)
       define_retry_method(base)
       define_retry_logic(base)
+      define_retry_callback(base)
     end
 
     private
 
-    attr_reader :backoff_strategy
+    attr_reader :backoff_strategy, :retry_callback
 
     def define_backoff_strategy(klass)
       klass.instance_variable_set(:@backoff_strategy, @backoff_strategy)
@@ -80,6 +78,11 @@ module ActiveJob
       klass.instance_eval do
         define_method :internal_retry do |exception|
           this_delay = self.class.backoff_strategy.retry_delay(retry_attempt, exception)
+
+          cb = self.class.retry_callback &&
+               instance_exec(exception, this_delay, &self.class.retry_callback)
+          return if cb == :halt
+
           # TODO: This breaks DelayedJob and Resque for some weird ActiveSupport reason.
           # logger.info("Retrying (attempt #{retry_attempt + 1}, waiting #{this_delay}s)")
           @retry_attempt += 1
@@ -103,6 +106,11 @@ module ActiveJob
       end
     end
 
+    def define_retry_callback(klass)
+      klass.instance_variable_set(:@retry_callback, @retry_callback)
+      klass.define_singleton_method(:retry_callback) { @retry_callback }
+    end
+
     def check_adapter!
       adapter = ActiveJob::Base.queue_adapter
       adapter_name =
@@ -114,6 +122,18 @@ module ActiveJob
       if PROBLEMATIC_ADAPTERS.include?(adapter_name)
         warn("#{adapter_name} does not support delayed retries, so does not work with " \
              'ActiveJob::Retry. You may experience strange behaviour.')
+      end
+    end
+
+    def validate_params
+      if retry_callback && !retry_callback.is_a?(Proc)
+        raise InvalidConfigurationError, 'Callback must be a `Proc`'
+      end
+
+      unless backoff_strategy_valid?
+        raise InvalidConfigurationError,
+              'Backoff strategies must define `should_retry?(attempt, exception)`, ' \
+              'and `retry_delay(attempt, exception)`.'
       end
     end
 
