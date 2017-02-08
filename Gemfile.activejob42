@@ -17,4 +17,7 @@ group :test, :integration do
   gem 'sqlite3'
   gem 'pg'
   gem 'rails', '~> 4.2'
+
+  # This is annoyingly required to make rubocop install
+  gem 'rake'
 end

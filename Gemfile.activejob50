@@ -19,4 +19,7 @@ group :test, :integration do
   gem 'rails', '~> 5.0'
 
   gem 'pry'
+
+  # This is annoyingly required to make rubocop install
+  gem 'rake'
 end
