@@ -121,9 +121,8 @@ ActiveJob jobs.
 Supported Versions
 ------------------
 
-Rails 4.2 and 5.0 are supported, on all versions of MRI which they support, except
-Ruby 1.9.3. Other Ruby runtimes (e.g. JRuby, Rubinius) probably work, but are not
-tested in Travis CI.
+Rails 4.2 and 5.0 are supported, Ruby 2.1+. Other Ruby runtimes (e.g. JRuby,
+Rubinius) probably work, but are not tested in Travis CI.
 
 Contributing
 ------------
