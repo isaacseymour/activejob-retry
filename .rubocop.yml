@@ -12,9 +12,6 @@ LineLength:
 Style/SignalException:
   EnforcedStyle: 'only_raise'
 
-Metrics/MethodLength:
-  CountComments: false
-
 Style/Documentation:
   Enabled: false
 
@@ -23,3 +20,12 @@ Style/DotPosition:
 
 Style/GuardClause:
   Enabled: false
+
+Metrics/MethodLength:
+  CountComments: false
+
+Metrics/BlockLength:
+  CountComments: false
+  Exclude:
+    - Rakefile
+    - spec/**/*

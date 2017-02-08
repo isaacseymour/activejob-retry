@@ -29,7 +29,7 @@ module ActiveJob
       # Limit must be an integer >= 0, or nil
       def validate_limit_numericality!
         return unless options[:limit]
-        return if options[:limit].is_a?(Fixnum) && options[:limit] >= 0
+        return if options[:limit].is_a?(Integer) && options[:limit] >= 0
 
         raise InvalidConfigurationError,
               'Limit must be an integer >= 0, or nil for unlimited retries'
