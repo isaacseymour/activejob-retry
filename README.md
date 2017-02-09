@@ -65,7 +65,6 @@ if the exception is not going to be retried, or has failed the final retry.
 | `fatal_exceptions`     | `[]`    | Same as for [constant](#constant-options).
 
 #### variable options
-
 | Option                 | Default | Description   |
 |:---------------------- |:------- |:------------- |
 | `delays`               |         | __required__ An array of delays between attempts in seconds. The first attempt will occur whenever you originally enqueued the job to happen.
@@ -73,6 +72,42 @@ if the exception is not going to be retried, or has failed the final retry.
 | `max_delay_multiplier` |         | The other end of the range for `min_delay_multiplier`. If one is supplied, both must be.
 | `retryable_exceptions` | `nil`   | Same as for [constant](#constant-options).
 | `fatal_exceptions`     | `[]`    | Same as for [constant](#constant-options).
+
+## Callback
+
+All strategies support a `callback` option:
+
+```ruby
+class ProcessWebhook < ActiveJob::Base
+  include ActiveJob::Retry.new(
+    strategy: :exponential, limit: 25,
+    callback: proc do |exception, delay|
+      # will be run before each retry
+    end
+  )
+end
+```
+
+`callback` must be a `proc` and is run before each retry. It receives the
+exception and delay before the next retry as arguments. It is evaluated on
+instance level, so you have access to all instance variables and methods (for
+example `retry_attempt`) of your job.
+
+If the callback returns `:halt`, retry chain is halted and no further retries
+will be made:
+
+```ruby
+class ProcessWebhook < ActiveJob::Base
+  include ActiveJob::Retry.new(
+    strategy: :exponential, limit: 25,
+    callback: proc do |exception, delay|
+      if some_condition
+        :halt # this will halt the retry chain
+      end
+    end
+  )
+end
+```
 
 ## Supported backends
 
