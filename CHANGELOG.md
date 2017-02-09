@@ -1,3 +1,16 @@
+## 0.6.3 - Feb 9, 2017
+
+- Add `callback` option, to be run before each retry, and potentially cancel the retry (by
+  [@doits](https://github.com/doits))
+
+## 0.6.2 - Aug 10, 2016
+
+- Rails 5 support (by [@isaacseymour](https://github.com/isaacseymour))
+
+## 0.6.1 - Jun 1, 2016
+
+- Apply retry settings to subclasses (by [@isaacseymour](https://github.com/isaacseymour))
+
 ## 0.6.0 - May 18, 2016
 
 - Change API usage to make improper use harder (by [@isaacseymour](https://github.com/isaacseymour))
