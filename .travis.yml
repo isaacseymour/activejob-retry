@@ -7,20 +7,21 @@ matrix:
   exclude:
     # Rails 5.0 dropped support for Ruby <2.2
     - rvm: 2.1
+      gemfile: Gemfile.activejob51
+    # Rails 5.0 dropped support for Ruby <2.2
+    - rvm: 2.1
       gemfile: Gemfile.activejob50
-    # Rails 4-2-stable supports Ruby 2.4, but the released version doesn't. Ignore for now.
-    - rvm: 2.4.0
-      gemfile: Gemfile.activejob42
 
 rvm:
   - 2.1
-  - 2.2.2
-  - 2.3.3
-  - 2.4.0
+  - 2.2.8
+  - 2.3.5
+  - 2.4.2
 
 gemfile:
   - Gemfile.activejob42
   - Gemfile.activejob50
+  - Gemfile.activejob51
 
 before_install:
   - gem update --system
@@ -29,7 +30,6 @@ before_install:
 script:
   - bundle exec rubocop
   - bundle exec rspec spec
-  - bundle exec rake test
 
 services:
   - redis

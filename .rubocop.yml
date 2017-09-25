@@ -4,7 +4,8 @@ AllCops:
   Exclude:
     - .*/**/*
     - vendor/**/*
-    - test/**/*
+    - activejob-retry.gemspec
+    - Gemfile
 
 LineLength:
   Max: 90
@@ -27,5 +28,4 @@ Metrics/MethodLength:
 Metrics/BlockLength:
   CountComments: false
   Exclude:
-    - Rakefile
     - spec/**/*

@@ -1,3 +1,4 @@
+require 'date'
 require File.expand_path('../lib/active_job/retry/version', __FILE__)
 
 Gem::Specification.new do |s|
@@ -23,7 +24,7 @@ Gem::Specification.new do |s|
 
   s.has_rdoc = false
   s.files = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
-  s.require_paths = %w(lib)
+  s.require_paths = %w[lib]
 
   s.add_dependency('activejob', '>= 4.2')
   s.add_dependency('activesupport', '>= 4.2')
