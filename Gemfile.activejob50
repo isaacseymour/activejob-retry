@@ -16,7 +16,7 @@ group :test, :integration do
   # Specs
   gem 'sqlite3'
   gem 'pg'
-  gem 'rails', '~> 5.1'
+  gem 'rails', '~> 5.0'
 
   gem 'pry'
 
