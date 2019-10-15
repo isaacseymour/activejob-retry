@@ -1,0 +1,25 @@
+source 'https://rubygems.org'
+
+gemspec
+
+group :test, :integration do
+  # Queues
+  gem 'backburner', require: false
+  gem 'delayed_job', require: false
+  gem 'delayed_job_active_record', require: false
+  gem 'que', require: false
+  gem 'resque', require: false
+  gem 'resque-scheduler', require: false
+  gem 'sequel', require: false
+  gem 'sidekiq', require: false
+
+  # Specs
+  gem 'pg'
+  gem 'rails', '~> 6.0'
+  gem 'sqlite3'
+
+  gem 'pry'
+
+  # This is annoyingly required to make rubocop install
+  gem 'rake'
+end

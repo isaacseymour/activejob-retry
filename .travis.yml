@@ -5,23 +5,24 @@ language: ruby
 
 matrix:
   exclude:
-    # Rails 5.0 dropped support for Ruby <2.2
-    - rvm: 2.1
-      gemfile: Gemfile.activejob51
-    # Rails 5.0 dropped support for Ruby <2.2
-    - rvm: 2.1
-      gemfile: Gemfile.activejob50
+    # Rails 6.0 dropped support for Ruby <2.5
+    - rvm: 2.3.5
+      gemfile: Gemfile.activejob60
+    - rvm: 2.4.9
+      gemfile: Gemfile.activejob60
 
 rvm:
-  - 2.1
-  - 2.2.8
   - 2.3.5
-  - 2.4.2
+  - 2.4.9
+  - 2.5.7
+  - 2.6.5
 
 gemfile:
   - Gemfile.activejob42
   - Gemfile.activejob50
   - Gemfile.activejob51
+  - Gemfile.activejob52
+  - Gemfile.activejob60
 
 before_install:
   - gem update --system
@@ -36,4 +37,4 @@ services:
   - rabbitmq
 
 addons:
-  postgresql: "9.6"
+  postgresql: "11"
