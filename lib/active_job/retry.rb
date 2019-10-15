@@ -1,23 +1,14 @@
+# frozen_string_literal: true
+
 require 'active_job'
 require 'active_support'
 require 'active_support/core_ext' # ActiveJob uses core exts, but doesn't require it
 require 'active_job/retry/version'
 require 'active_job/retry/errors'
-require 'active_job/retry/constant_backoff_strategy'
-require 'active_job/retry/variable_backoff_strategy'
-require 'active_job/retry/exponential_backoff_strategy'
+require 'active_job/retry/strategy'
 
 unless ActiveJob::Base.method_defined?(:deserialize)
   require 'active_job/retry/deserialize_monkey_patch'
-end
-
-def choose_strategy(strategy, options)
-  case strategy
-  when :constant    then ActiveJob::Retry::ConstantBackoffStrategy.new(options)
-  when :variable    then ActiveJob::Retry::VariableBackoffStrategy.new(options)
-  when :exponential then ActiveJob::Retry::ExponentialBackoffStrategy.new(options)
-  else strategy
-  end
 end
 
 module ActiveJob
@@ -34,7 +25,7 @@ module ActiveJob
     #################
     def initialize(strategy: nil, callback: nil, **options)
       check_adapter!
-      @backoff_strategy = choose_strategy(strategy, options)
+      @backoff_strategy = Strategy.choose(strategy, options)
       @retry_callback = callback
 
       validate_params
