@@ -6,13 +6,10 @@ language: ruby
 matrix:
   exclude:
     # Rails 6.0 dropped support for Ruby <2.5
-    - rvm: 2.3.5
-      gemfile: Gemfile.activejob60
     - rvm: 2.4.9
       gemfile: Gemfile.activejob60
 
 rvm:
-  - 2.3.5
   - 2.4.9
   - 2.5.7
   - 2.6.5
