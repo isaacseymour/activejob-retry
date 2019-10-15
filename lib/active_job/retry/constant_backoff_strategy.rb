@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_job/retry/constant_options_validator'
 
 module ActiveJob
@@ -14,6 +16,7 @@ module ActiveJob
       def should_retry?(attempt, exception)
         return false if retry_limit_reached?(attempt)
         return false unless retryable_exception?(exception)
+
         true
       end
 
@@ -27,6 +30,7 @@ module ActiveJob
 
       def retry_limit_reached?(attempt)
         return false unless retry_limit
+
         attempt >= retry_limit
       end
 

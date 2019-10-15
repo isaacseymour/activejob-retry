@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe ActiveJob::Retry do
@@ -182,9 +184,9 @@ RSpec.describe ActiveJob::Retry do
     context '1st attempt' do
       let(:job_data) do
         {
-          'job_class'     => 'SomeJob',
-          'job_id'        => 'uuid',
-          'arguments'     => ['arg1', { 'arg' => 2 }],
+          'job_class' => 'SomeJob',
+          'job_id' => 'uuid',
+          'arguments' => ['arg1', { 'arg' => 2 }],
           'retry_attempt' => 1
         }
       end
@@ -197,9 +199,9 @@ RSpec.describe ActiveJob::Retry do
     context '7th attempt' do
       let(:job_data) do
         {
-          'job_class'     => 'SomeJob',
-          'job_id'        => 'uuid',
-          'arguments'     => ['arg1', { 'arg' => 2 }],
+          'job_class' => 'SomeJob',
+          'job_id' => 'uuid',
+          'arguments' => ['arg1', { 'arg' => 2 }],
           'retry_attempt' => 7
         }
       end
@@ -218,9 +220,9 @@ RSpec.describe ActiveJob::Retry do
       context '1st attempt' do
         let(:job_data) do
           {
-            'job_class'     => 'SomeJob',
-            'job_id'        => 'uuid',
-            'arguments'     => ['arg1', { 'arg' => 2 }],
+            'job_class' => 'SomeJob',
+            'job_id' => 'uuid',
+            'arguments' => ['arg1', { 'arg' => 2 }],
             'retry_attempt' => 1
           }
         end
@@ -233,9 +235,9 @@ RSpec.describe ActiveJob::Retry do
       context '7th attempt' do
         let(:job_data) do
           {
-            'job_class'     => 'SomeJob',
-            'job_id'        => 'uuid',
-            'arguments'     => ['arg1', { 'arg' => 2 }],
+            'job_class' => 'SomeJob',
+            'job_id' => 'uuid',
+            'arguments' => ['arg1', { 'arg' => 2 }],
             'retry_attempt' => 7
           }
         end

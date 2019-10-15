@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_job/retry/exponential_options_validator'
 
 module ActiveJob

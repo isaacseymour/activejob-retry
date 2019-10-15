@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_job/retry/constant_backoff_strategy'
 require 'active_job/retry/variable_options_validator'
 
@@ -27,6 +29,7 @@ module ActiveJob
 
       def delay_multiplier
         return max_delay_multiplier unless random_delay?
+
         rand(min_delay_multiplier..max_delay_multiplier)
       end
     end

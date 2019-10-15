@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # In Rails 4.2, ActiveJob externally applies deserialized job ID, queue name, arguments to
 # the instantiated job in `ActiveJob::Base.deserialize`, which cannot be overridden in
 # subclasses. https://github.com/rails/rails/pull/18260 changes this to delegate as much

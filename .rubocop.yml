@@ -1,11 +1,11 @@
 AllCops:
   Include:
-    - Rakefile
+    - "Rakefile"
+    - "**/*.rb"
   Exclude:
-    - .*/**/*
-    - vendor/**/*
-    - activejob-retry.gemspec
-    - Gemfile
+    - "vendor/**/*"
+    - "activejob-retry.gemspec"
+    - "Gemfile"
 
 LineLength:
   Max: 90
