@@ -5,3 +5,4 @@
 .ruby-version
 Gemfile.lock
 Gemfile.*.lock
+Gemfile
