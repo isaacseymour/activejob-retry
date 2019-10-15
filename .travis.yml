@@ -24,10 +24,6 @@ gemfile:
   - Gemfile.activejob52
   - Gemfile.activejob60
 
-before_install:
-  - gem update --system
-  - gem install bundler
-
 script:
   - bundle exec rubocop
   - bundle exec rspec spec
