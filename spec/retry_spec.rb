@@ -22,6 +22,19 @@ RSpec.describe ActiveJob::Retry do
       expect(job.backoff_strategy).to be_a(ActiveJob::Retry::ConstantBackoffStrategy)
     end
 
+    it 'does not pollute the class' do
+      klass = Class.new(ActiveJob::Base)
+      instance_methods = klass.instance_methods.dup
+      methods = klass.methods.dup
+
+      klass.send(:include, retry_instance)
+
+      expect(klass.instance_methods).
+        to match_array(instance_methods << :internal_retry << :retry_attempt)
+      expect(klass.methods).
+        to match_array(methods << :backoff_strategy << :retry_callback)
+    end
+
     context 'invalid options' do
       let(:options) { { limit: -2 } }
 
