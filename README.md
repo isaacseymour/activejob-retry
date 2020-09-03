@@ -156,7 +156,7 @@ ActiveJob jobs.
 Supported Versions
 ------------------
 
-Rails 4.2, 5.0, and 5.1 are supported, Ruby 2.1+. Other Ruby runtimes (e.g. JRuby,
+Rails 4.2, 5.0, 5.1, 5.2, and 6.0 are supported, Ruby 2.1+. Other Ruby runtimes (e.g. JRuby,
 Rubinius) probably work, but are not tested in Travis CI.
 
 Contributing
